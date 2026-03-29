@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 01: Vibe Coding이란 무엇인가? — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-01">
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">
+        <span>&lt;/&gt;</span> Vibe Coding
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 01</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Module Header -->
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a>
+        <span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a>
+        <span class="separator">/</span>
+        <span>Module 01</span>
+      </div>
+      <h1>Vibe Coding이란 무엇인가?</h1>
+      <div class="module-header-meta">
+        <span class="badge beginner">초급</span>
+        <span class="tool-badge claude">Claude</span>
+        <span class="tool-badge antigravity">Antigravity</span>
+        <span class="tool-badge gemini">Gemini</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          30분
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Module Content -->
+  <div class="module-layout">
+    <!-- Sidebar -->
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="#intro">
+            <span class="sidebar-checkbox" data-step="intro"></span>
+            개요
+          </a>
+        </li>
+        <li>
+          <a href="#what-is-vibe">
+            <span class="sidebar-checkbox" data-step="what-is-vibe"></span>
+            Vibe Coding이란?
+          </a>
+        </li>
+        <li>
+          <a href="#tools">
+            <span class="sidebar-checkbox" data-step="tools"></span>
+            AI 도구 소개 및 설정
+          </a>
+        </li>
+        <li>
+          <a href="#prompting">
+            <span class="sidebar-checkbox" data-step="prompting"></span>
+            프롬프트 작성법
+          </a>
+        </li>
+        <li>
+          <a href="#tips">
+            <span class="sidebar-checkbox" data-step="tips"></span>
+            트랙별 팁
+          </a>
+        </li>
+        <li>
+          <a href="#troubleshooting">
+            <span class="sidebar-checkbox" data-step="troubleshooting"></span>
+            트러블슈팅
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 6 완료</span>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>Vibe Coding의 개념을 이해하고, AI 코딩 도구를 설정하고, 효과적인 프롬프트 작성법을 익힌다</p>
+      </div>
+      <p>이 모듈은 모든 학습자가 공통으로 이수하는 필수 모듈입니다. Vibe Coding이 무엇인지 이해하고, 이번 워크숍에서 사용할 3가지 AI 도구를 설정합니다.</p>
+
+      <h2 id="what-is-vibe">Part 1: Vibe Coding이란?</h2>
+      <p>"Vibe Coding"은 <strong>AI와 자연어 대화만으로 소프트웨어를 만드는 새로운 프로그래밍 방식</strong>입니다.</p>
+      <p>코드를 직접 작성하지 않습니다. 대신 AI에게 <strong>원하는 것을 말로 설명</strong>하면, AI가 코드를 생성하고 실행합니다.</p>
+
+      <blockquote style="border-left: 3px solid var(--accent-blue); padding: 12px 20px; margin: 24px 0; background: var(--bg-light); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+        <p style="font-style: italic; margin-bottom: 4px;">"나는 코드를 보지도 않는다. 그냥 느낌대로(vibe) AI에게 말하고, 결과를 확인하고, 다시 말한다."</p>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">— Andrej Karpathy (OpenAI 공동창업자)</p>
+      </blockquote>
+
+      <h3>전통적 개발 vs Vibe Coding</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9375rem;">
+          <thead>
+            <tr style="background: var(--bg-light);">
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">구분</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">전통적 개발</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">Vibe Coding</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">입력</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">코드 (Python, JavaScript 등)</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">자연어 (한국어, 영어)</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">필요 지식</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">프로그래밍 언어, 프레임워크</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">원하는 결과물에 대한 명확한 설명</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">개발 속도</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">수일~수주</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">수분~수시간</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">대상</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">개발자</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">누구나</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">핵심 역량</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">코딩 능력</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">프롬프트 작성 능력</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>왜 지금 Vibe Coding인가?</h3>
+      <ol>
+        <li><strong>AI 코딩 도구의 급격한 발전</strong>: Claude, Gemini 등 AI가 생성하는 코드의 품질이 실무 수준에 도달</li>
+        <li><strong>비개발자의 디지털 역량 강화</strong>: 아이디어만 있으면 누구나 프로토타입을 만들 수 있는 시대</li>
+        <li><strong>업무 자동화 가속</strong>: 반복적인 업무를 AI와 함께 자동화하여 효율 극대화</li>
+        <li><strong>정부/공공기관의 디지털 전환</strong>: NIA를 비롯한 공공기관에서 AI 활용 역량이 핵심 경쟁력</li>
+      </ol>
+
+      <h3>Vibe Coding으로 할 수 있는 것들</h3>
+
+      <div class="track-tabs">
+        <button class="tab active" data-track="nondev-examples">비개발자도 가능</button>
+        <button class="tab" data-track="dev-examples">개발자 도전</button>
+      </div>
+      <div class="tab-content" data-track="nondev-examples">
+        <ul>
+          <li>회의록 자동 정리기</li>
+          <li>데이터를 차트로 시각화</li>
+          <li>나만의 웹페이지 만들기</li>
+          <li>이메일 자동 분류/요약 도구</li>
+          <li>설문조사 결과 분석기</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dev-examples">
+        <ul>
+          <li>공공데이터 API 대시보드</li>
+          <li>Slack/Teams 알림봇</li>
+          <li>실시간 통계 모니터링 페이지</li>
+          <li>업무 자동화 파이프라인</li>
+        </ul>
+      </div>
+
+      <h2 id="tools">Part 2: AI 도구 3종 소개 및 설정</h2>
+
+      <h3>Claude (Anthropic)</h3>
+      <h4>Claude.ai (웹 버전) — 비개발자 추천</h4>
+      <ul>
+        <li><strong>특징</strong>: 웹 브라우저에서 대화형으로 사용, Artifacts 기능으로 코드 결과를 실시간 미리보기</li>
+        <li><strong>강점</strong>: 장문 맥락 이해력 우수, 높은 코드 품질, 한국어 지원 뛰어남</li>
+      </ul>
+      <p><strong>설정 방법:</strong></p>
+      <ol>
+        <li><a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a> 접속</li>
+        <li>"Sign up" &rarr; 이메일 또는 Google 계정으로 가입</li>
+        <li>이메일 인증 완료 &rarr; 바로 대화 시작</li>
+      </ol>
+
+      <h4>Claude Code (CLI 버전) — 개발자 추천</h4>
+      <ul>
+        <li><strong>특징</strong>: 터미널에서 직접 파일을 생성/수정/실행하는 고급 도구</li>
+      </ul>
+      <pre class="language-bash"><code class="language-bash"># Node.js v18 이상 필요
+npm install -g @anthropic-ai/claude-code
+claude  # 안내에 따라 로그인</code></pre>
+
+      <h3>Antigravity (한국 AI 코딩 도구)</h3>
+      <ul>
+        <li><strong>특징</strong>: 한국어에 최적화된 AI 코딩 도구</li>
+        <li><strong>강점</strong>: 국내 서비스 연동 편리, 한국어 자연어 처리 우수</li>
+      </ul>
+      <p><strong>설정 방법:</strong></p>
+      <ol>
+        <li>Antigravity 웹사이트 접속</li>
+        <li>계정 가입 또는 로그인</li>
+        <li>"새 프로젝트" 생성 &rarr; 바로 사용</li>
+      </ol>
+
+      <h3>Gemini (Google)</h3>
+      <ul>
+        <li><strong>Google AI Studio</strong>: 웹 기반 프로토타이핑, 다양한 모델 선택 가능</li>
+        <li><strong>Gemini</strong>: 간편 대화형 인터페이스</li>
+        <li><strong>강점</strong>: Google Workspace 연동, 멀티모달(텍스트+이미지) 지원</li>
+      </ul>
+      <p><strong>설정 방법:</strong></p>
+      <ol>
+        <li><a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a> 또는 <a href="https://gemini.google.com" target="_blank" rel="noopener">gemini.google.com</a> 접속</li>
+        <li>Google 계정으로 로그인 &rarr; 바로 사용</li>
+      </ol>
+
+      <h3>도구 비교 요약</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9375rem;">
+          <thead>
+            <tr style="background: var(--bg-light);">
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">항목</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">Claude</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">Antigravity</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">Gemini</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">미리보기</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Artifacts 패널</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">내장 미리보기</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">코드 제공 (AI Studio)</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">한국어 이해</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">우수</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">최적화</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">우수</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">특화 분야</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">복잡한 로직, 문서화</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">한국 서비스 연동</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Google 생태계 연동</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">CLI 도구</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Claude Code</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">—</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">Gemini Code Assist</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="prompting">Part 3: 효과적인 프롬프트 작성법</h2>
+      <p>AI에게 잘 요청하는 것이 Vibe Coding의 핵심 역량입니다.</p>
+
+      <h3>원칙 1: 구체적으로 설명하라</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9375rem;">
+          <thead>
+            <tr style="background: var(--bg-light);">
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">나쁜 예</th>
+              <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600;">좋은 예</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"웹페이지 만들어줘"</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"파란색 헤더가 있고, 3개의 카드로 팀원을 소개하는 웹페이지를 만들어줘"</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"예쁘게 해줘"</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"배경은 흰색, 포인트 컬러는 #3B82F6, 둥근 모서리의 카드 디자인으로 해줘"</td></tr>
+            <tr><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"데이터 분석해줘"</td><td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">"이 CSV 파일의 월별 매출 데이터를 막대 차트로 시각화해줘"</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>원칙 2: 맥락을 제공하라</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">좋은 프롬프트 예시</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">나는 NIA에서 디지털혁신 업무를 담당하고 있어.
+매주 회의록을 정리하는데 시간이 많이 걸려.
+회의 내용을 붙여넣으면 자동으로 정리해주는 도구를 만들고 싶어.
+참석자, 논의 사항, 결정 사항, 다음 할 일로 구분해서 정리해줘.</pre>
+      </div>
+
+      <h3>원칙 3: 단계적으로 요청하라</h3>
+      <p>한 번에 모든 것을 요구하지 마세요. 작게 시작하고 점진적으로 기능을 추가하세요.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">단계적 요청 예시</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">[1단계] "간단한 회의록 정리 웹페이지를 만들어줘"
+[2단계] "입력란에 회의 내용을 붙여넣으면 자동으로 구분해서 정리해줘"
+[3단계] "정리된 결과를 복사할 수 있는 버튼을 추가해줘"
+[4단계] "PDF로 다운로드할 수 있는 기능도 넣어줘"</pre>
+      </div>
+
+      <h3>원칙 4: 피드백으로 개선하라</h3>
+      <p>AI의 결과물을 확인하고, 마음에 들지 않는 부분을 <strong>구체적으로</strong> 지적하세요.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">피드백 예시</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">전체적으로 좋은데, 다음 부분을 수정해줘:
+1. 헤더 글자가 너무 작아 — 24px로 키워줘
+2. 카드 사이 간격이 좁아 — 20px 정도로 넓혀줘
+3. 모바일에서 카드가 가로로 나열됨 — 세로로 쌓이게 해줘</pre>
+      </div>
+
+      <h2 id="tips">트랙별 팁</h2>
+
+      <div class="track-tabs">
+        <button class="tab active" data-track="nondev-tips">비개발자 팁</button>
+        <button class="tab" data-track="dev-tips">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nondev-tips">
+        <ul>
+          <li><strong>Claude.ai를 먼저 시작하세요</strong>: Artifacts 미리보기가 있어서 결과를 가장 쉽게 확인할 수 있습니다</li>
+          <li><strong>두려워하지 마세요</strong>: AI가 만든 코드를 이해할 필요는 없습니다. 결과가 원하는 대로 나오는지만 확인하세요</li>
+          <li><strong>실험하세요</strong>: 같은 요청을 여러 도구에 해보고, 결과를 비교해 보세요</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dev-tips">
+        <ul>
+          <li><strong>Claude Code</strong>는 기존 프로젝트 폴더에서 실행하면 프로젝트 컨텍스트를 자동으로 파악합니다</li>
+          <li>각 도구의 API를 활용하면 자동화 파이프라인을 구축할 수 있습니다</li>
+          <li>Claude Code + Gemini Code Assist를 IDE에서 동시에 활용하는 것도 가능합니다</li>
+        </ul>
+      </div>
+
+      <h2 id="troubleshooting">트러블슈팅</h2>
+
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            계정을 만들 수 없어요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <ul>
+                <li><strong>Claude</strong>: 일부 국가에서 접속이 제한될 수 있습니다</li>
+                <li><strong>Gemini</strong>: Google 계정이 필요합니다. 회사 Google Workspace 계정으로도 가능합니다</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            AI가 영어로 답변해요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>프롬프트를 한국어로 작성하면 대부분 한국어로 답변합니다. "한국어로 답변해주세요"를 프롬프트에 추가하세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            Claude Code 설치가 안 돼요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <ul>
+                <li><code>node --version</code>으로 Node.js 버전 확인 (v18 이상 필요)</li>
+                <li>권한 문제 시: <code>sudo npm install -g @anthropic-ai/claude-code</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Navigation -->
+      <div class="module-nav">
+        <div></div>
+        <a href="module-02.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">첫 번째 성공 경험 — 나만의 웹페이지 만들기</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

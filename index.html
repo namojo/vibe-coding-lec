@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI와 함께하는 Vibe Coding — NIA 실무형 강의</title>
+  <meta name="description" content="NIA 직원을 위한 AI 코딩 도구 실무 워크숍. Claude, Antigravity, Gemini를 활용한 Vibe Coding 강의.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="index.html" class="nav-logo">
+        <span>&lt;/&gt;</span> Vibe Coding
+      </a>
+      <ul class="nav-links">
+        <li><a href="#modules" class="active">모듈</a></li>
+        <li><a href="#tools">AI 도구</a></li>
+        <li><a href="#path">학습 경로</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        NIA 직원 대상 실무 워크숍
+      </div>
+      <h1>AI와 대화로 만드는<br><span class="gradient-text">Vibe Coding</span></h1>
+      <p class="hero-subtitle">
+        코드를 몰라도 괜찮습니다.<br>
+        Claude, Antigravity, Gemini와 대화하며<br>
+        실무에 바로 쓸 수 있는 도구를 직접 만들어 보세요.
+      </p>
+      <a href="pages/module-01.html" class="hero-cta">
+        시작하기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item fade-in">
+          <div class="stat-number">21</div>
+          <div class="stat-label">실습 사례</div>
+        </div>
+        <div class="stat-item fade-in" style="transition-delay: 0.1s">
+          <div class="stat-number">9</div>
+          <div class="stat-label">학습 모듈</div>
+        </div>
+        <div class="stat-item fade-in" style="transition-delay: 0.2s">
+          <div class="stat-number">3</div>
+          <div class="stat-label">AI 도구</div>
+        </div>
+        <div class="stat-item fade-in" style="transition-delay: 0.3s">
+          <div class="stat-number">8h</div>
+          <div class="stat-label">총 소요 시간</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Module Cards -->
+  <section id="modules" class="section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>학습 모듈</h2>
+        <p>초급부터 고급까지, 단계별로 AI 코딩 역량을 키워보세요</p>
+      </div>
+      <div class="modules-grid">
+        <!-- Dynamically rendered by main.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Tools Section -->
+  <section id="tools" class="section tools-section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>AI 도구 소개</h2>
+        <p>각 도구의 특성을 이해하고, 상황에 맞는 최적의 도구를 선택하세요</p>
+      </div>
+      <div class="tools-grid">
+        <div class="tool-card claude fade-in">
+          <div class="tool-card-icon">C</div>
+          <h3>Claude</h3>
+          <p>Anthropic의 AI 어시스턴트. Artifacts로 즉시 결과물을 확인하고, Claude Code로 본격 개발까지. 긴 맥락 이해와 안전한 코드 생성이 강점입니다.</p>
+        </div>
+        <div class="tool-card antigravity fade-in" style="transition-delay: 0.1s">
+          <div class="tool-card-icon">A</div>
+          <h3>Antigravity</h3>
+          <p>국내 개발 AI 플랫폼. 한국어에 최적화되어 있으며, 웹 앱을 빠르게 프로토타이핑하고 배포할 수 있는 올인원 환경을 제공합니다.</p>
+        </div>
+        <div class="tool-card gemini fade-in" style="transition-delay: 0.2s">
+          <div class="tool-card-icon">G</div>
+          <h3>Gemini</h3>
+          <p>Google의 멀티모달 AI. Google Workspace와의 강력한 연동, 대용량 데이터 처리, AI Studio를 통한 커스텀 앱 제작이 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Learning Path -->
+  <section id="path" class="section path-section">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>학습 경로</h2>
+        <p>자신에게 맞는 트랙을 선택하세요</p>
+      </div>
+
+      <div class="path-tabs fade-in">
+        <button class="path-tab active" data-path="non-dev">비개발자 트랙</button>
+        <button class="path-tab" data-path="dev">개발자 트랙</button>
+      </div>
+
+      <div class="path-content active" data-path="non-dev">
+        <div class="path-flow fade-in">
+          <div class="path-step"><span class="path-step-number">1</span> Vibe Coding 소개</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">2</span> 웹페이지 만들기</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">3</span> 문서 자동화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">4</span> 데이터 시각화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">5</span> 업무 자동화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">6</span> 웹앱 만들기</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">7</span> 외부 서비스 연동</div>
+        </div>
+        <p class="path-description fade-in">약 5시간 | 코드 경험 없이도 실무 도구를 만들 수 있는 핵심 경험을 제공합니다</p>
+      </div>
+
+      <div class="path-content" data-path="dev">
+        <div class="path-flow fade-in">
+          <div class="path-step"><span class="path-step-number">1</span> Vibe Coding 소개</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">2</span> 웹페이지</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">3</span> 문서 자동화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">4</span> 데이터 시각화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">5</span> 업무 자동화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">6</span> 웹앱</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">7</span> 외부 연동</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">8</span> 개발자 심화</div>
+          <span class="path-arrow">&rarr;</span>
+          <div class="path-step"><span class="path-step-number">9</span> 풀스택 프로젝트</div>
+        </div>
+        <p class="path-description fade-in">약 8시간 | 공통 모듈을 빠르게 훑고, 모듈 8-9에서 실무 개발에 AI를 통합하는 심화 기술을 습득합니다</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="js/modules-data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

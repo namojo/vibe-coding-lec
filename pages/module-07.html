@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 07: 외부 서비스 연동 — Google Sheets와 공공데이터 — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-07">
+
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo"><span>&lt;/&gt;</span> Vibe Coding</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 07</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a><span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a><span class="separator">/</span>
+        <span>Module 07</span>
+      </div>
+      <h1>외부 서비스 연동 — Google Sheets와 공공데이터</h1>
+      <div class="module-header-meta">
+        <span class="badge intermediate">중급</span>
+        <span class="tool-badge gemini">Gemini</span>
+        <span class="tool-badge antigravity">Antigravity</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          50분
+        </span>
+      </div>
+      <div class="module-wow">&ldquo;공공데이터 포털의 데이터가 실시간 대시보드로 변한다&rdquo;</div>
+    </div>
+  </section>
+
+  <div class="module-layout">
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li><a href="#intro"><span class="sidebar-checkbox" data-step="intro"></span>개요</a></li>
+        <li><a href="#case-7-1"><span class="sidebar-checkbox" data-step="c71"></span>사례 7-1: Google Sheets</a></li>
+        <li><a href="#case-7-1-s1"><span class="sidebar-checkbox" data-step="s1"></span>&nbsp;&nbsp;Step 1: 데이터 뷰어</a></li>
+        <li><a href="#case-7-1-s2"><span class="sidebar-checkbox" data-step="s2"></span>&nbsp;&nbsp;Step 2: 새로고침/알림</a></li>
+        <li><a href="#case-7-1-s3"><span class="sidebar-checkbox" data-step="s3"></span>&nbsp;&nbsp;Step 3: 보고서 내보내기</a></li>
+        <li><a href="#case-7-2"><span class="sidebar-checkbox" data-step="c72"></span>사례 7-2: 공공데이터 대시보드</a></li>
+        <li><a href="#tips"><span class="sidebar-checkbox" data-step="tips"></span>팁 & 트러블슈팅</a></li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 7 완료</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      </div>
+    </aside>
+
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>외부 API와 서비스를 연동하여 실시간 데이터를 활용하는 도구를 만든다</p>
+      </div>
+
+      <p>이런 분께 추천합니다:</p>
+      <ul>
+        <li>Google Sheets 데이터를 활용한 자동화에 관심 있는 분</li>
+        <li>공공데이터 API를 활용해보고 싶은 분 (개발자)</li>
+        <li>외부 데이터를 시각적으로 표현하고 싶은 분</li>
+      </ul>
+
+      <div class="tip-box warning">
+        <div class="tip-box-title">사전 준비</div>
+        <p>Gemini 또는 Antigravity 계정 로그인, Google 계정, (개발자) 공공데이터포털 API 키</p>
+      </div>
+
+      <h2 id="case-7-1">사례 7-1: Google Sheets 연동 자동화</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge gemini">Gemini</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">Google Sheets 데이터를 읽어와 시각화하거나 보고서로 변환하는 도구를 만듭니다.</p>
+      </div>
+
+      <h3 id="case-7-1-s1">Step 1: Sheets 데이터 뷰어 만들기</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">Google Sheets 데이터를 가져와서 표시하는 웹 도구를 만들어주세요.
+
+기능:
+- Google Sheets URL 입력 필드
+- "데이터 가져오기" 버튼
+- 가져온 데이터를 테이블로 표시
+- 데이터를 차트로 시각화
+
+구현 방법:
+- Google Sheets의 "웹에 게시" 기능을 활용
+- 또는 데모용으로 하드코딩된 예제 데이터 제공
+
+예제 데이터 (기본 표시):
+월,민원건수,처리율(%),평균처리일
+1월,234,95.2,3.2
+2월,289,93.8,3.5
+3월,312,96.1,2.8
+4월,278,97.3,2.5
+5월,345,94.5,3.1
+6월,298,98.0,2.3
+
+표시:
+- 상단: 요약 카드 (총 건수, 평균 처리율, 평균 처리일)
+- 중단: 데이터 테이블 (정렬 가능)
+- 하단: 추이 차트 (민원건수 막대 + 처리율 선)
+
+Chart.js 사용. 깔끔한 대시보드 디자인.</pre>
+      </div>
+
+      <div class="tip-box success">
+        <div class="tip-box-title">예상 결과</div>
+        <p>요약 카드, 정렬 가능한 테이블, 복합 차트가 포함된 대시보드가 생성됩니다.</p>
+      </div>
+
+      <h3 id="case-7-1-s2">Step 2: 자동 새로고침과 알림</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 기능을 추가해주세요:
+
+1. 데이터 자동 새로고침 (30초/1분/5분 간격 선택)
+2. 마지막 업데이트 시간 표시
+3. 처리율이 95% 미만이면 빨간색 경고 표시
+4. 데이터 변화량 표시 (전월 대비 증감, 화살표 아이콘)
+5. 테이블 열 클릭 시 정렬 (오름차순/내림차순 토글)</pre>
+      </div>
+
+      <h3 id="case-7-1-s3">Step 3: 보고서 내보내기</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">보고서 내보내기 기능을 추가해주세요:
+1. "보고서 생성" 버튼 — 데이터, 차트, 요약을 포함한 보고서 페이지
+2. 인쇄 최적화 (A4, 깔끔한 레이아웃)
+3. 보고서에 자동 날짜/시간 삽입
+4. CSV 다운로드 버튼</pre>
+      </div>
+
+      <h2 id="case-7-2">사례 7-2: 공공데이터 API로 대시보드 만들기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge antigravity">Antigravity</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">공공데이터포털의 실시간 API를 활용하여 인구 통계 대시보드를 만듭니다.</p>
+      </div>
+      <p><span class="track-badge">개발자 트랙</span></p>
+
+      <h3>Step 1: 공공데이터 API 연동</h3>
+      <p>Antigravity에 접속합니다.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">공공데이터포털 API를 활용한 대시보드 웹페이지를 만들어주세요.
+
+주제: 대한민국 인구 통계 대시보드
+
+참고: 실제 API 호출은 CORS 문제가 있을 수 있으므로,
+데모용으로 실제 공공데이터를 기반으로 한 하드코딩 데이터를 사용해주세요.
+
+데이터 (2023년 기준):
+지역,인구수,전년대비(%),고령화율(%),출생률
+서울,"9,428,372",-0.8,17.2,0.55
+부산,"3,338,774",-1.2,20.1,0.72
+대구,"2,385,412",-0.9,18.5,0.78
+인천,"2,980,552",0.3,14.8,0.82
+대전,"1,452,251",-0.5,15.9,0.76
+세종,"388,045",5.2,9.1,1.12
+
+대시보드 구성:
+- 전국 요약 카드 (총인구, 평균 고령화율, 평균 출생률)
+- 지역별 인구 막대 차트
+- 고령화율 수평 막대 차트 (경고색 표시: 20% 이상 빨강)
+- 지역 선택 드롭다운 → 상세 정보 카드
+
+Chart.js 사용. 반응형 디자인.</pre>
+      </div>
+
+      <h3>Step 2: 인터랙티브 필터링</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">인터랙티브 필터 기능을 추가해주세요:
+
+1. 지역 멀티 선택 체크박스 (전체 선택/해제)
+2. 정렬 기준 선택 (인구수, 고령화율, 출생률)
+3. 차트 유형 전환 (막대, 선, 레이더)
+4. 데이터 테이블에서 행 클릭 시 해당 지역 하이라이트
+5. "비교 모드" — 2개 지역을 선택하여 나란히 비교</pre>
+      </div>
+
+      <h2 id="tips">팁 & 트러블슈팅</h2>
+      <div class="track-tabs">
+        <button class="tab active" data-track="nd7">비개발자 팁</button>
+        <button class="tab" data-track="dv7">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nd7">
+        <ul>
+          <li>Google Sheets의 "파일 &rarr; 웹에 게시" 기능을 활용하면 외부에서 데이터를 읽을 수 있습니다</li>
+          <li>대시보드 HTML 파일을 팀원들과 공유하면 같은 데이터를 시각적으로 볼 수 있습니다</li>
+          <li>사례 7-1(Google Sheets)만으로도 충분히 유용합니다. 사례 7-2는 개발 경험이 있는 분께 추천합니다</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dv7">
+        <p>공공데이터포털(data.go.kr)에서 다양한 API를 탐색해보세요.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">심화 프롬프트: 프록시 서버</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">Express.js 서버를 만들어서 공공데이터 API를 프록시해줘.
+/api/population 엔드포인트로 요청하면
+서버에서 공공데이터 API를 호출하고 결과를 반환하도록 해줘.</pre>
+      </div>
+      </div>
+
+      <h3>트러블슈팅</h3>
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            Google Sheets 데이터를 가져올 수 없어요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>Sheets가 "웹에 게시" 상태인지 확인하세요. 공유 설정이 "링크가 있는 모든 사용자"로 되어 있는지 확인하세요. CORS 문제가 있을 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            공공데이터 API 호출이 안 돼요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>API 키가 올바른지 확인하세요. data.go.kr에서 해당 API를 '활용 신청'했는지 확인하세요 (승인까지 시간 소요). 브라우저에서 직접 호출 시 CORS 오류가 발생할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            차트 데이터가 업데이트되지 않아요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>Chart.js는 데이터 변경 후 chart.update()를 호출해야 합니다. "데이터 변경 시 차트가 자동 업데이트되도록 수정해줘"라고 요청하세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-nav">
+        <a href="module-06.html" class="module-nav-link prev">
+          <span class="module-nav-label">&larr; 이전 모듈</span>
+          <span class="module-nav-title">인터랙티브 웹앱 만들기</span>
+        </a>
+        <a href="module-08.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">개발자를 위한 심화 — 본격 개발 도구 활용</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

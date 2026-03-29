@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 06: 인터랙티브 웹앱 만들기 — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-06">
+
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo"><span>&lt;/&gt;</span> Vibe Coding</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 06</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a><span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a><span class="separator">/</span>
+        <span>Module 06</span>
+      </div>
+      <h1>인터랙티브 웹앱 만들기</h1>
+      <div class="module-header-meta">
+        <span class="badge intermediate">중급</span>
+        <span class="tool-badge gemini">Gemini</span>
+        <span class="tool-badge claude">Claude</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          60분
+        </span>
+      </div>
+      <div class="module-wow">&ldquo;PPT 없이 AI로 인터랙티브 프레젠테이션을 만들었다&rdquo;</div>
+    </div>
+  </section>
+
+  <div class="module-layout">
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li><a href="#intro"><span class="sidebar-checkbox" data-step="intro"></span>개요</a></li>
+        <li><a href="#case-6-1"><span class="sidebar-checkbox" data-step="c61"></span>사례 6-1: 계산기/변환기</a></li>
+        <li><a href="#case-6-2"><span class="sidebar-checkbox" data-step="c62"></span>사례 6-2: 프레젠테이션</a></li>
+        <li><a href="#case-6-3"><span class="sidebar-checkbox" data-step="c63"></span>사례 6-3: 보고서 변환</a></li>
+        <li><a href="#tips"><span class="sidebar-checkbox" data-step="tips"></span>팁 & 트러블슈팅</a></li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 5 완료</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      </div>
+    </aside>
+
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>단순 웹페이지를 넘어, 사용자 입력을 받고 결과를 보여주는 인터랙티브 웹앱을 만든다</p>
+      </div>
+
+      <p>이런 분께 추천합니다:</p>
+      <ul>
+        <li>단순 웹페이지를 넘어 동적 기능이 있는 도구를 만들고 싶은 분</li>
+        <li>계산기나 변환 도구를 직접 만들어보고 싶은 분</li>
+        <li>발표 자료를 새로운 방식으로 만들어보고 싶은 분</li>
+      </ul>
+
+      <h2 id="case-6-1">사례 6-1: 간단한 계산기/변환기 웹앱</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge gemini">Gemini</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            20분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">실무에서 자주 쓰는 다기능 단위 변환기를 웹앱으로 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 다기능 변환기 만들기</h3>
+      <p>Google AI Studio에 접속합니다.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다기능 단위 변환기 웹앱을 만들어주세요.
+
+변환 카테고리 (탭으로 전환):
+1. 환율 계산기
+   - 원화(KRW) ↔ 달러(USD), 엔(JPY), 유로(EUR)
+   - 고정 환율 사용 (USD: 1350, JPY: 9.0, EUR: 1450)
+   - 금액 입력 시 실시간 변환
+
+2. 날짜 계산기
+   - 두 날짜 사이 일수 계산
+   - D-Day 계산 (특정 날짜까지 남은 일수)
+   - 근무일 계산 (주말 제외)
+
+3. 파일 크기 변환기
+   - B, KB, MB, GB, TB 상호 변환
+   - 입력 시 모든 단위로 동시 표시
+
+디자인:
+- 상단 탭 네비게이션
+- 각 탭별 깔끔한 입력/출력 폼
+- 입력 시 실시간 결과 표시 (버튼 클릭 불필요)
+- 파란색 포인트 컬러, 둥근 모서리</pre>
+      </div>
+
+      <h3>Step 2: 추가 기능</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 기능을 추가해주세요:
+1. 각 변환 결과 옆에 "복사" 버튼
+2. 최근 변환 이력 (하단에 최근 5개 표시)
+3. 키보드 Enter 키로 변환 실행
+4. 결과 숫자에 천 단위 쉼표(,) 표시
+5. 탭 전환 시 부드러운 애니메이션</pre>
+      </div>
+
+      <h2 id="case-6-2">사례 6-2: 인터랙티브 프레젠테이션 만들기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge claude">Claude</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">슬라이드 형태의 인터랙티브 프레젠테이션을 웹으로 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 프레젠테이션 기본 구조</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">인터랙티브 웹 프레젠테이션을 만들어주세요.
+
+주제: "AI 시대의 디지털 정부혁신"
+
+슬라이드 구성:
+1. 표지 — 제목, 발표자 정보, NIA 로고 자리
+2. 목차 — 클릭하면 해당 슬라이드로 이동
+3. AI 기술 현황 — 주요 수치를 카운트업 애니메이션으로 표시
+4. 디지털 정부혁신 방향 — 3개 카드 (클릭 시 상세 내용 펼침)
+5. 사례 소개 — 이미지 placeholder + 설명
+6. 기대 효과 — 차트 (Chart.js)
+7. Q&A — "질문을 입력해주세요" 입력 폼
+
+기능:
+- 좌우 화살표 키로 슬라이드 이동
+- 하단에 슬라이드 인디케이터 (점)
+- 부드러운 슬라이드 전환 애니메이션
+- 전체 화면 모드 버튼
+- 슬라이드 번호 표시
+
+디자인:
+- 16:9 비율
+- 어두운 남색 배경에 흰색 텍스트
+- 슬라이드마다 다른 레이아웃</pre>
+      </div>
+
+      <h3>Step 2: 발표자 노트 추가</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">발표자 모드를 추가해주세요:
+1. "P" 키를 누르면 발표자 노트 패널이 토글
+2. 각 슬라이드에 발표자 노트 (예: "이 슬라이드에서 3분 소요")
+3. 발표 타이머 표시 (경과 시간)
+4. 발표자 노트 패널에 다음 슬라이드 미리보기</pre>
+      </div>
+
+      <h2 id="case-6-3">사례 6-3: 엑셀 데이터를 보고서로 변환하기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge claude">Claude</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            15분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">CSV/엑셀 데이터를 입력하면 서식이 갖춰진 보고서 형태로 변환하는 도구를 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 데이터-보고서 변환기</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">CSV 데이터를 보고서 형태로 변환하는 웹 도구를 만들어주세요.
+
+기능:
+- CSV 데이터 입력 영역
+- 보고서 템플릿 선택 (현황 보고서, 실적 보고서, 비교 분석)
+- "변환" 버튼
+- 보고서 출력: 표 + 차트 + 요약
+
+예제 CSV:
+부서,1분기,2분기,3분기,4분기
+기획부,85,92,88,95
+개발부,78,85,90,93
+운영부,90,88,92,97
+디자인부,82,87,85,91
+
+보고서에 포함될 내용:
+- 제목과 생성 날짜
+- 데이터 테이블 (색상 포맷팅: 90 이상 초록, 80 미만 빨강)
+- 분기별 추이 선 차트
+- 부서별 비교 막대 차트
+- 요약: 최고/최저 실적 부서, 전체 평균, 전분기 대비 변화
+
+Chart.js 사용. 인쇄 가능한 디자인.</pre>
+      </div>
+
+      <h3>Step 2: 보고서 커스터마이징</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">보고서 커스터마이징 옵션을 추가해주세요:
+1. 보고서 제목 편집
+2. 로고/기관명 입력
+3. 표시할 차트 종류 체크박스 (선/막대/파이)
+4. 색상 테마 선택 (기관용 파랑, 실적용 초록, 경고용 빨강)
+5. "PDF 인쇄" 버튼 (브라우저 인쇄 기능 활용)</pre>
+      </div>
+
+      <h2 id="tips">팁 & 트러블슈팅</h2>
+      <div class="track-tabs">
+        <button class="tab active" data-track="nd6">비개발자 팁</button>
+        <button class="tab" data-track="dv6">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nd6">
+        <ul>
+          <li>계산기/변환기는 자주 쓰는 도구를 만들어 즐겨찾기에 추가하세요</li>
+          <li>프레젠테이션은 PPT 대신 사용할 수 있습니다. HTML 파일 하나로 어디서든 발표 가능합니다</li>
+          <li>보고서 변환기는 매월 정기 보고서 작성 시 큰 도움이 됩니다</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dv6">
+        <p>reveal.js 프레임워크를 사용하면 더 다양한 프레젠테이션 효과가 가능합니다.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">심화 프롬프트: XLSX 파일 업로드</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">SheetJS 라이브러리를 CDN으로 추가하고,
+.xlsx 파일을 드래그 앤 드롭으로 업로드할 수 있게 해줘.
+업로드된 파일을 파싱해서 자동으로 보고서를 생성해줘.</pre>
+      </div>
+      </div>
+
+      <h3>트러블슈팅</h3>
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            프레젠테이션에서 화살표 키가 안 먹어요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>프레젠테이션 영역을 한 번 클릭하여 포커스를 맞춘 후 화살표 키를 누르세요. Artifacts 내에서는 키보드 이벤트가 제한될 수 있습니다. HTML 파일로 저장 후 브라우저에서 열어보세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            차트가 안 나와요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>Chart.js CDN이 로드되었는지 확인하세요. 인터넷 연결이 필요합니다. &quot;Chart.js를 CDN 대신 인라인으로 포함해줘&quot;라고 요청해볼 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            보고서 인쇄 시 차트가 잘려요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>"인쇄 시 차트가 페이지 안에 맞도록 크기를 조정해줘"라고 요청하세요. @media print에서 차트 크기를 고정 크기로 설정하세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-nav">
+        <a href="module-05.html" class="module-nav-link prev">
+          <span class="module-nav-label">&larr; 이전 모듈</span>
+          <span class="module-nav-title">업무 자동화 — 반복 작업에서 해방</span>
+        </a>
+        <a href="module-07.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">외부 서비스 연동 — Google Sheets와 공공데이터</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

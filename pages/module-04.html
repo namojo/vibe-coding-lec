@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 04: 데이터를 눈에 보이게 — 시각화와 분석 — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-04">
+
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo"><span>&lt;/&gt;</span> Vibe Coding</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 04</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a><span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a><span class="separator">/</span>
+        <span>Module 04</span>
+      </div>
+      <h1>데이터를 눈에 보이게 — 시각화와 분석</h1>
+      <div class="module-header-meta">
+        <span class="badge beginner">초급~중급</span>
+        <span class="tool-badge claude">Claude</span>
+        <span class="tool-badge gemini">Gemini</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          50분
+        </span>
+      </div>
+      <div class="module-wow">&ldquo;엑셀 파일 하나 던졌더니 인터랙티브 차트가 나온다&rdquo;</div>
+    </div>
+  </section>
+
+  <div class="module-layout">
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li><a href="#intro"><span class="sidebar-checkbox" data-step="intro"></span>개요</a></li>
+        <li><a href="#case-4-1"><span class="sidebar-checkbox" data-step="c41"></span>사례 4-1: CSV 시각화</a></li>
+        <li><a href="#case-4-1-s1"><span class="sidebar-checkbox" data-step="s1"></span>&nbsp;&nbsp;Step 1: 기본 차트</a></li>
+        <li><a href="#case-4-1-s2"><span class="sidebar-checkbox" data-step="s2"></span>&nbsp;&nbsp;Step 2: 옵션 추가</a></li>
+        <li><a href="#case-4-1-s3"><span class="sidebar-checkbox" data-step="s3"></span>&nbsp;&nbsp;Step 3: 저장 기능</a></li>
+        <li><a href="#case-4-2"><span class="sidebar-checkbox" data-step="c42"></span>사례 4-2: 설문 분석기</a></li>
+        <li><a href="#tips"><span class="sidebar-checkbox" data-step="tips"></span>팁 & 트러블슈팅</a></li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 7 완료</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      </div>
+    </aside>
+
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>CSV/엑셀 데이터를 차트와 대시보드로 변환한다. Chart.js를 활용한 시각화 도구를 직접 만들어 본다.</p>
+      </div>
+
+      <p>이런 분께 추천합니다:</p>
+      <ul>
+        <li>데이터를 보고서에 시각적으로 표현하고 싶은 분</li>
+        <li>엑셀 차트보다 더 세련된 시각화가 필요한 분</li>
+        <li>설문조사 결과를 빠르게 분석하고 싶은 분</li>
+      </ul>
+
+      <div class="tip-box warning">
+        <div class="tip-box-title">사전 준비</div>
+        <p>Claude.ai 또는 Gemini 계정 로그인, 시각화할 CSV 데이터 (없으면 예제 사용)</p>
+      </div>
+
+      <h2 id="case-4-1">사례 4-1: CSV 데이터를 차트로 시각화하기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge claude">Claude</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">CSV 데이터를 업로드하면 다양한 차트로 시각화해주는 웹 도구를 만듭니다.</p>
+      </div>
+
+      <h3 id="case-4-1-s1">Step 1: 기본 차트 생성기 만들기</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">CSV 데이터를 차트로 시각화하는 웹 도구를 만들어주세요.
+
+기능:
+- 텍스트 영역에 CSV 데이터를 붙여넣기
+- 차트 유형 선택: 막대 차트, 선 차트, 파이 차트
+- "차트 생성" 버튼을 누르면 차트가 그려짐
+
+예제 데이터를 기본으로 넣어주세요:
+월,방문자수,가입자수
+1월,1200,45
+2월,1500,62
+3월,1800,78
+4월,2200,95
+5월,2600,110
+6월,3000,130
+
+차트 라이브러리는 Chart.js를 CDN으로 사용해주세요.
+깔끔한 디자인으로 만들어주세요.</pre>
+      </div>
+
+      <div class="tip-box success">
+        <div class="tip-box-title">예상 결과</div>
+        <p>CSV 입력 영역과 차트 표시 영역이 포함된 도구가 생성됩니다. 예제 데이터로 바로 차트를 확인할 수 있습니다.</p>
+      </div>
+
+      <h3 id="case-4-1-s2">Step 2: 차트 옵션 추가하기</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">차트 기능을 강화해주세요:
+
+1. 차트 제목 입력 필드 추가
+2. 색상 테마 선택 (기본, 파스텔, 비비드, 모노톤)
+3. 데이터 값 표시 on/off 토글
+4. X축, Y축 레이블 자동 감지 (CSV 첫 행 사용)
+5. 차트에 마우스를 올리면 수치가 툴팁으로 표시</pre>
+      </div>
+
+      <h3 id="case-4-1-s3">Step 3: 차트 저장 기능</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">차트를 이미지로 저장하는 기능을 추가해주세요:
+1. "PNG로 저장" 버튼 — 차트를 PNG 이미지로 다운로드
+2. 저장 시 차트 제목과 날짜가 하단에 표시
+3. 배경색 옵션 (투명, 흰색)</pre>
+      </div>
+
+      <h2 id="case-4-2">사례 4-2: 설문조사 결과 자동 분석기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge gemini">Gemini</span>
+          <span class="badge intermediate">중급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">설문조사 데이터를 입력하면 자동으로 분석 결과와 시각화를 생성하는 도구를 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 설문 분석 대시보드 만들기</h3>
+      <p>Google AI Studio에 접속합니다.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">설문조사 결과를 분석하는 대시보드 웹페이지를 만들어주세요.
+
+예제 데이터 (기본 내장):
+질문: "AI 도구 활용 교육에 대한 만족도 조사"
+
+문항별 결과:
+1. 교육 내용 만족도: 매우만족 35%, 만족 40%, 보통 15%, 불만족 8%, 매우불만족 2%
+2. 강사 만족도: 매우만족 42%, 만족 38%, 보통 12%, 불만족 6%, 매우불만족 2%
+3. 실습 환경: 매우만족 28%, 만족 35%, 보통 22%, 불만족 10%, 매우불만족 5%
+4. 업무 활용 가능성: 매우그렇다 45%, 그렇다 30%, 보통 15%, 아니다 7%, 매우아니다 3%
+
+표시할 내용:
+- 전체 응답 요약 (총 응답자 수, 평균 만족도)
+- 문항별 수평 막대 차트
+- 전체 만족도 도넛 차트
+- 문항별 점수 비교 레이더 차트
+
+Chart.js CDN 사용. 깔끔한 대시보드 디자인으로 만들어주세요.</pre>
+      </div>
+
+      <h3>Step 2: 데이터 편집 기능</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">데이터를 직접 편집할 수 있는 기능을 추가해주세요:
+
+1. "데이터 편집" 버튼 — 클릭하면 편집 패널이 슬라이드로 열림
+2. 각 문항의 응답 비율을 숫자 입력으로 수정 가능
+3. 문항 추가/삭제 기능
+4. "차트 업데이트" 버튼으로 변경 사항 반영
+5. 편집 패널은 닫기 버튼으로 숨길 수 있음</pre>
+      </div>
+
+      <h3>Step 3: 분석 보고서 생성</h3>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">분석 보고서 출력 기능을 추가해주세요:
+
+1. "보고서 생성" 버튼
+2. 보고서 내용:
+   - 조사 개요 (제목, 응답자 수, 기간)
+   - 주요 결과 요약 (가장 만족도 높은/낮은 항목)
+   - 문항별 상세 분석
+   - 차트 포함
+   - 개선 제안 (만족도 낮은 항목에 대해)
+3. 보고서 인쇄 기능 (@media print 적용)</pre>
+      </div>
+
+      <h2 id="tips">팁 & 트러블슈팅</h2>
+      <div class="track-tabs">
+        <button class="tab active" data-track="nd4">비개발자 팁</button>
+        <button class="tab" data-track="dv4">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nd4">
+        <ul>
+          <li>엑셀에서 데이터를 선택 &rarr; 복사 &rarr; CSV 입력란에 붙여넣기하면 됩니다</li>
+          <li>차트 이미지를 다운로드하여 PPT, 보고서에 바로 삽입할 수 있습니다</li>
+          <li>색상 테마를 "파스텔"로 선택하면 보고서에 넣기 좋은 부드러운 색상이 적용됩니다</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dv4">
+        <p>Chart.js 외에 D3.js를 사용하면 더 복잡한 시각화가 가능합니다.</p>
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">심화 프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">D3.js를 사용해서 트리맵, 산점도, 히트맵도 지원하도록 확장해줘.
+차트 간 드릴다운 기능도 추가해줘 (막대 클릭 시 상세 차트로 전환).</pre>
+      </div>
+      </div>
+
+      <h3>트러블슈팅</h3>
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            CSV 데이터가 제대로 파싱이 안 돼요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>쉼표(,)로 구분된 형식인지 확인하세요. 첫 행이 헤더(열 이름)인지 확인하세요. 빈 행이나 특수 문자가 있으면 제거해보세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            차트가 너무 작아요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>"차트 크기를 화면 너비의 80%로 키워줘"라고 요청하세요. 모바일에서는 가로 스크롤이 되도록 요청할 수도 있습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            한국어 레이블이 깨져요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>Chart.js의 기본 폰트를 한국어 지원 폰트로 변경 요청하세요. "폰트를 Pretendard 또는 Noto Sans KR로 바꿔줘"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-nav">
+        <a href="module-03.html" class="module-nav-link prev">
+          <span class="module-nav-label">&larr; 이전 모듈</span>
+          <span class="module-nav-title">문서 자동화 — 회의록부터 보고서까지</span>
+        </a>
+        <a href="module-05.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">업무 자동화 — 반복 작업에서 해방</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

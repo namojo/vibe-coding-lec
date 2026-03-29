@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 02: 첫 번째 성공 경험 — 나만의 웹페이지 만들기 — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-02">
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">
+        <span>&lt;/&gt;</span> Vibe Coding
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 02</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Module Header -->
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a>
+        <span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a>
+        <span class="separator">/</span>
+        <span>Module 02</span>
+      </div>
+      <h1>첫 번째 성공 경험 — 나만의 웹페이지 만들기</h1>
+      <div class="module-header-meta">
+        <span class="badge beginner">초급</span>
+        <span class="tool-badge claude">Claude</span>
+        <span class="tool-badge antigravity">Antigravity</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          50분
+        </span>
+      </div>
+      <div class="module-wow">&ldquo;코드를 한 줄도 안 썼는데 진짜 웹페이지가 나온다!&rdquo;</div>
+    </div>
+  </section>
+
+  <!-- Module Content -->
+  <div class="module-layout">
+    <!-- Sidebar -->
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="#intro">
+            <span class="sidebar-checkbox" data-step="intro"></span>
+            개요
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1">
+            <span class="sidebar-checkbox" data-step="case-2-1"></span>
+            사례 2-1: 포트폴리오 페이지
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1-step1">
+            <span class="sidebar-checkbox" data-step="case-2-1-step1"></span>
+            &nbsp;&nbsp;Step 1: 기본 페이지
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1-step2">
+            <span class="sidebar-checkbox" data-step="case-2-1-step2"></span>
+            &nbsp;&nbsp;Step 2: 디자인 개선
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1-step3">
+            <span class="sidebar-checkbox" data-step="case-2-1-step3"></span>
+            &nbsp;&nbsp;Step 3: 섹션 추가
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1-step4">
+            <span class="sidebar-checkbox" data-step="case-2-1-step4"></span>
+            &nbsp;&nbsp;Step 4: 커스터마이징
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-1-step5">
+            <span class="sidebar-checkbox" data-step="case-2-1-step5"></span>
+            &nbsp;&nbsp;Step 5: 저장하기
+          </a>
+        </li>
+        <li>
+          <a href="#case-2-2">
+            <span class="sidebar-checkbox" data-step="case-2-2"></span>
+            사례 2-2: 팀 소개 페이지
+          </a>
+        </li>
+        <li>
+          <a href="#tips">
+            <span class="sidebar-checkbox" data-step="tips"></span>
+            팁 & 트러블슈팅
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 9 완료</span>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>AI와 대화만으로 웹페이지를 처음부터 완성까지 만들어 본다</p>
+      </div>
+
+      <p>이런 분께 추천합니다:</p>
+      <ul>
+        <li>Vibe Coding을 처음 체험해보는 분</li>
+        <li>HTML/CSS를 전혀 모르지만 웹페이지를 만들어보고 싶은 분</li>
+        <li>AI 코딩 도구의 가능성을 직접 느껴보고 싶은 분</li>
+      </ul>
+
+      <div class="tip-box warning">
+        <div class="tip-box-title">사전 준비</div>
+        <p>Claude.ai 또는 Antigravity 계정 로그인 완료 (Module 1 참고), 웹 브라우저 (Chrome, Edge, Safari 등)</p>
+      </div>
+
+      <!-- Case 2-1 -->
+      <h2 id="case-2-1">사례 2-1: 나만의 포트폴리오 웹페이지 만들기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge claude">Claude</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            30분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">Claude와 대화만으로 개인 포트폴리오 웹페이지를 완성합니다. 완성 결과에는 프로필 영역, 자기소개, 관심 분야 뱃지, 주요 업무 목록, 연락처가 포함됩니다.</p>
+      </div>
+
+      <h3 id="case-2-1-step1">Step 1: 기본 페이지 만들기</h3>
+      <p>Claude.ai에 접속하여 다음 프롬프트를 입력합니다.</p>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">자기소개 웹페이지를 만들어주세요.
+
+포함할 내용:
+- 이름: 홍길동
+- 소속: NIA 디지털혁신부
+- 직함: 선임연구원
+- 소개: "디지털 정부혁신과 AI 활용 연구를 담당하고 있습니다."
+- 관심 분야: AI, 디지털 전환, 공공데이터
+
+디자인 요구사항:
+- 깔끔하고 모던한 디자인
+- 흰색 배경에 파란색 포인트 컬러
+- 프로필 사진 자리에 원형 placeholder
+- 모바일에서도 잘 보이게
+
+HTML, CSS를 하나의 파일에 포함해주세요.</pre>
+      </div>
+
+      <div class="tip-box success">
+        <div class="tip-box-title">예상 결과</div>
+        <p>Claude가 완성된 HTML/CSS 코드를 생성합니다. Artifacts 패널에서 웹페이지 미리보기가 바로 나타납니다.</p>
+      </div>
+
+      <h3 id="case-2-1-step2">Step 2: 디자인 개선하기</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">이 페이지를 더 세련되게 개선해주세요:
+
+1. 상단에 은은한 그라데이션 배경 (파란색 → 보라색 계열)
+2. 프로필 카드에 그림자 효과 추가
+3. 관심 분야를 태그 형태의 뱃지로 표시
+4. 마우스를 올리면 카드가 살짝 떠오르는 hover 효과
+5. 페이지가 열릴 때 부드럽게 나타나는 fade-in 애니메이션</pre>
+      </div>
+
+      <div class="tip-box success">
+        <div class="tip-box-title">예상 결과</div>
+        <p>그라데이션 배경, 카드 그림자, 뱃지 태그, hover 효과, fade-in 애니메이션이 적용됩니다.</p>
+      </div>
+
+      <h3 id="case-2-1-step3">Step 3: 섹션 추가하기</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 섹션들을 추가해주세요:
+
+1. "주요 업무" 섹션
+   - AI 정책 연구 및 분석
+   - 디지털 정부혁신 프로젝트 관리
+   - 공공데이터 활용 촉진
+
+2. "연락처" 섹션
+   - 이메일: hong@nia.or.kr
+   - 전화: 02-1234-5678
+   - 위치: 세종특별자치시
+
+3. 하단 footer에 저작권 표시: "© 2026 홍길동. All rights reserved."
+
+각 섹션은 아이콘(이모지)으로 시각적으로 구분해주세요.</pre>
+      </div>
+
+      <h3 id="case-2-1-step4">Step 4: 나만의 정보로 커스터마이징</h3>
+      <p>예제 정보를 <strong>본인의 실제 정보</strong>로 교체합니다.</p>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 정보로 내용을 변경해주세요:
+
+- 이름: [본인 이름]
+- 소속: [본인 부서]
+- 직함: [본인 직함]
+- 소개: [본인 한 줄 소개]
+- 관심 분야: [본인 관심 분야 3~5개]
+- 주요 업무: [본인 주요 업무 3개]
+- 이메일: [본인 이메일]</pre>
+      </div>
+
+      <h3 id="case-2-1-step5">Step 5: 결과물 저장하기</h3>
+
+      <div class="track-tabs">
+        <button class="tab active" data-track="save-nondev">비개발자</button>
+        <button class="tab" data-track="save-dev">개발자</button>
+      </div>
+      <div class="tab-content" data-track="save-nondev">
+        <p><strong>Artifacts에서 복사 (비개발자 추천)</strong></p>
+        <ol>
+          <li>Artifacts 패널에서 "Copy" 버튼 클릭</li>
+          <li>메모장 또는 텍스트 편집기 열기</li>
+          <li>붙여넣기 (Ctrl+V / Cmd+V)</li>
+          <li>"다른 이름으로 저장" &rarr; 파일명: <code>index.html</code> &rarr; 파일 형식: "모든 파일"</li>
+          <li>저장한 파일을 더블클릭하면 브라우저에서 열립니다</li>
+        </ol>
+      </div>
+      <div class="tab-content hidden" data-track="save-dev">
+        <p><strong>Claude Code 사용</strong></p>
+        <pre class="language-bash"><code class="language-bash">mkdir my-profile && cd my-profile
+claude
+# "자기소개 웹페이지를 index.html로 만들어줘"</code></pre>
+        <p style="margin-top: 16px;"><strong>GitHub Pages로 배포하기</strong></p>
+        <pre class="language-bash"><code class="language-bash">git init
+git add index.html
+git commit -m "나만의 프로필 페이지"
+git remote add origin https://github.com/[username]/[username].github.io.git
+git push -u origin main</code></pre>
+        <p>배포 후 <code>https://[username].github.io</code>에서 확인 가능합니다.</p>
+      </div>
+
+      <!-- Case 2-2 -->
+      <h2 id="case-2-2">사례 2-2: 팀 소개 페이지 만들기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge antigravity">Antigravity</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            20분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">Antigravity로 부서/팀 소개 페이지를 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 기본 팀 소개 페이지 만들기</h3>
+      <p>Antigravity에 접속하여 새 프로젝트를 생성합니다.</p>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">NIA 디지털혁신부 팀 소개 웹페이지를 만들어주세요.
+
+포함할 내용:
+- 부서명: 디지털혁신부
+- 부서 소개: "디지털 정부혁신과 지능정보사회 구현을 위한 핵심 부서입니다"
+- 팀원 3명 (카드 형태):
+  - 김철수 / 부장 / AI 정책
+  - 이영희 / 과장 / 데이터 분석
+  - 박민수 / 대리 / 서비스 기획
+- 주요 사업: 디지털 정부혁신, AI 활용 확산, 공공데이터 개방
+
+디자인:
+- 깔끔한 화이트 테마
+- 팀원 카드에 hover 효과
+- 모바일 반응형</pre>
+      </div>
+
+      <h3>Step 2: 디자인 커스터마이징</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음을 개선해주세요:
+1. 상단에 NIA 로고 자리 placeholder 추가
+2. 팀원 카드에 프로필 이미지 placeholder (원형, 회색 배경)
+3. 주요 사업을 아이콘과 함께 그리드 형태로 배치
+4. 하단에 연락처와 오시는 길 섹션 추가</pre>
+      </div>
+
+      <h3>Step 3: 인터랙티브 요소 추가</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">인터랙티브 요소를 추가해주세요:
+1. 팀원 카드를 클릭하면 상세 정보가 펼쳐지는 효과
+2. 주요 사업 섹션에 탭으로 각 사업 상세 내용 전환
+3. 스크롤 시 각 섹션이 순차적으로 나타나는 애니메이션</pre>
+      </div>
+
+      <!-- Tips & Troubleshooting -->
+      <h2 id="tips">팁 & 트러블슈팅</h2>
+
+      <div class="track-tabs">
+        <button class="tab active" data-track="nondev-tips2">비개발자 팁</button>
+        <button class="tab" data-track="dev-tips2">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nondev-tips2">
+        <h4>프롬프트 작성 요령</h4>
+        <ul>
+          <li><strong>구체적으로</strong>: "예쁘게"보다 "파란색 배경에 흰색 글자로"가 훨씬 좋습니다</li>
+          <li><strong>나눠서 요청</strong>: 한 번에 모든 걸 요구하지 말고, 단계별로 추가해 나가세요</li>
+          <li><strong>참고 이미지 설명</strong>: "네이버 프로필 페이지 같은 느낌으로"처럼 참고 대상을 언급하세요</li>
+        </ul>
+        <h4>결과물이 마음에 안 들 때</h4>
+        <ul>
+          <li>"글자 크기를 20% 더 키워주세요" — 구체적 수치 제공</li>
+          <li>"이 부분은 마음에 드는데, 배경색만 바꿔주세요" — 좋은 부분 명시</li>
+          <li>"처음부터 다시 만들어주세요. 미니멀한 스타일로" — 완전히 새로 시작</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dev-tips2">
+        <h4>반응형 + 다크모드 강화</h4>
+        <div class="prompt-block">
+          <div class="prompt-header">
+            <span class="prompt-label">심화 프롬프트</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="prompt-content">반응형 디자인과 다크 모드를 추가해줘:
+- 768px 이하에서는 단일 컬럼 레이아웃
+- prefers-color-scheme으로 다크 모드 자동 전환
+- 다크 모드 수동 토글 버튼도 추가</pre>
+        </div>
+      </div>
+
+      <h3>트러블슈팅</h3>
+
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            Artifacts에서 미리보기가 안 보여요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>"이 코드의 미리보기를 보여주세요"라고 요청해보세요. 브라우저를 새로고침한 후 다시 시도하세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            코드를 복사했는데 한국어가 깨져요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>파일 저장 시 인코딩을 UTF-8로 설정하세요. 코드 상단에 <code>&lt;meta charset="UTF-8"&gt;</code>이 있는지 확인하세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            AI가 이전 대화를 잊은 것 같아요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>같은 대화창 안에서 계속 요청하세요. 새 대화를 시작하면 이전 맥락이 사라집니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            HTML 파일이 안 열려요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>파일 확장자가 <code>.html</code>인지 확인 (<code>.txt</code>가 아닌지). 파일을 마우스 오른쪽 클릭 &rarr; "연결 프로그램" &rarr; Chrome/Edge 선택</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Navigation -->
+      <div class="module-nav">
+        <a href="module-01.html" class="module-nav-link prev">
+          <span class="module-nav-label">&larr; 이전 모듈</span>
+          <span class="module-nav-title">Vibe Coding이란 무엇인가?</span>
+        </a>
+        <a href="module-03.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">문서 자동화 — 회의록부터 보고서까지</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>

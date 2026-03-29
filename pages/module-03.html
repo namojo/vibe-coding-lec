@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 03: 문서 자동화 — 회의록부터 보고서까지 — Vibe Coding</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-module="module-03">
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="메인 내비게이션">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">
+        <span>&lt;/&gt;</span> Vibe Coding
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="../index.html#modules">모듈</a></li>
+        <li><a href="#" class="active">Module 03</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Module Header -->
+  <section class="module-header">
+    <div class="container">
+      <div class="module-breadcrumb">
+        <a href="../index.html">홈</a>
+        <span class="separator">/</span>
+        <a href="../index.html#modules">모듈</a>
+        <span class="separator">/</span>
+        <span>Module 03</span>
+      </div>
+      <h1>문서 자동화 — 회의록부터 보고서까지</h1>
+      <div class="module-header-meta">
+        <span class="badge beginner">초급</span>
+        <span class="tool-badge claude">Claude</span>
+        <span class="tool-badge gemini">Gemini</span>
+        <span class="module-time">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          60분
+        </span>
+      </div>
+      <div class="module-wow">&ldquo;30분 걸리던 회의록 정리가 1분이면 끝난다&rdquo;</div>
+    </div>
+  </section>
+
+  <!-- Module Content -->
+  <div class="module-layout">
+    <!-- Sidebar -->
+    <aside class="module-sidebar">
+      <div class="sidebar-title">목차</div>
+      <ul class="sidebar-nav">
+        <li><a href="#intro"><span class="sidebar-checkbox" data-step="intro"></span>개요</a></li>
+        <li><a href="#case-3-1"><span class="sidebar-checkbox" data-step="case-3-1"></span>사례 3-1: 회의록 정리기</a></li>
+        <li><a href="#case-3-1-step1"><span class="sidebar-checkbox" data-step="s1"></span>&nbsp;&nbsp;Step 1: 기본 도구</a></li>
+        <li><a href="#case-3-1-step2"><span class="sidebar-checkbox" data-step="s2"></span>&nbsp;&nbsp;Step 2: 테스트</a></li>
+        <li><a href="#case-3-1-step3"><span class="sidebar-checkbox" data-step="s3"></span>&nbsp;&nbsp;Step 3: 출력 강화</a></li>
+        <li><a href="#case-3-2"><span class="sidebar-checkbox" data-step="case-3-2"></span>사례 3-2: 정책 브리핑</a></li>
+        <li><a href="#case-3-3"><span class="sidebar-checkbox" data-step="case-3-3"></span>사례 3-3: 번역 도우미</a></li>
+        <li><a href="#tips"><span class="sidebar-checkbox" data-step="tips"></span>팁 & 트러블슈팅</a></li>
+      </ul>
+      <div class="sidebar-progress">
+        <span class="progress-text">0 / 8 완료</span>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="module-content">
+      <h2 id="intro">개요</h2>
+      <div class="tip-box">
+        <div class="tip-box-title">학습 목표</div>
+        <p>매일 반복하는 문서 작업을 AI로 자동화한다. 회의록 정리, 정책 브리핑 생성, 다국어 번역 도구를 직접 만들어 본다.</p>
+      </div>
+
+      <p>이런 분께 추천합니다:</p>
+      <ul>
+        <li>매주 회의록 정리에 시간을 쓰는 분</li>
+        <li>정책 보고서를 자주 작성하는 분</li>
+        <li>다국어 문서 번역이 필요한 분</li>
+      </ul>
+
+      <div class="tip-box warning">
+        <div class="tip-box-title">사전 준비</div>
+        <p>Claude.ai 또는 Gemini 계정 로그인, 정리할 회의 내용(텍스트) 준비 (없으면 예제 사용)</p>
+      </div>
+
+      <!-- Case 3-1 -->
+      <h2 id="case-3-1">사례 3-1: AI로 회의록 자동 정리기 만들기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge claude">Claude</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            25분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">회의 내용을 붙여넣으면 구조화된 회의록으로 자동 정리해주는 웹 도구를 만듭니다.</p>
+      </div>
+
+      <h3 id="case-3-1-step1">Step 1: 기본 회의록 정리 도구 만들기</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">회의록 자동 정리 웹 도구를 만들어주세요.
+
+기능:
+- 왼쪽: 회의 내용을 붙여넣는 텍스트 입력 영역
+- "정리하기" 버튼
+- 오른쪽: 정리된 회의록 출력 영역
+
+정리 형식:
+- 회의 정보 (날짜, 참석자)
+- 논의 사항 (번호 매기기)
+- 결정 사항
+- Action Items (담당자, 기한)
+
+디자인:
+- 깔끔한 2단 레이아웃
+- 흰색 배경, 파란색 포인트
+- 모바일에서는 세로 배치
+
+참고: 실제 AI API 호출 없이, JavaScript로 텍스트를 파싱하여
+키워드 기반으로 분류하는 간단한 로직으로 구현해주세요.
+(예: "결정:", "다음 할 일:", "참석:" 등의 키워드를 기준으로 분류)</pre>
+      </div>
+
+      <div class="tip-box success">
+        <div class="tip-box-title">예상 결과</div>
+        <p>2단 레이아웃의 회의록 정리 도구가 생성됩니다. 텍스트를 입력하고 버튼을 누르면 구조화된 형태로 출력됩니다.</p>
+      </div>
+
+      <h3 id="case-3-1-step2">Step 2: 예제 데이터로 테스트하기</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 예제 회의 내용으로 테스트해주세요. 입력란에 기본으로 들어가 있게 해주세요:
+
+"2024년 3월 15일 주간회의
+참석: 김부장, 이과장, 박대리, 최주임
+
+김부장: 지난주 AI 활용 교육 준비 상황을 공유해주세요.
+이과장: 교육 자료 초안 완성했습니다. 검토 부탁드립니다.
+박대리: 실습 환경 세팅 중입니다. 다음주 월요일까지 완료 예정입니다.
+김부장: 좋습니다. 교육 일정은 4월 첫째 주로 확정합시다.
+
+결정: 교육 일정 4월 1일~3일로 확정
+결정: 교육 자료 검토 기한 3월 22일
+
+다음 할 일:
+- 이과장: 교육 자료 최종본 3월 22일까지 제출
+- 박대리: 실습 환경 3월 20일까지 완료
+- 최주임: 참석자 명단 취합 3월 18일까지"</pre>
+      </div>
+
+      <h3 id="case-3-1-step3">Step 3: 출력 기능 강화</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 기능을 추가해주세요:
+1. "복사하기" 버튼 — 정리된 회의록을 클립보드에 복사
+2. "마크다운으로 복사" 버튼 — 마크다운 형식으로 복사
+3. 복사 완료 시 "복사되었습니다!" 알림 표시 (2초 후 사라짐)
+4. "초기화" 버튼 — 입력/출력 모두 비우기</pre>
+      </div>
+
+      <!-- Case 3-2 -->
+      <h2 id="case-3-2">사례 3-2: 정책 브리핑 자동 생성기</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge gemini">Gemini</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            20분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">정책 키워드를 입력하면 브리핑 문서 초안을 자동 생성하는 도구를 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 브리핑 문서 템플릿 생성기</h3>
+      <p>Google AI Studio에 접속합니다.</p>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">정책 브리핑 문서 자동 생성 웹 도구를 HTML/CSS/JavaScript로 만들어주세요.
+
+입력 필드:
+- 정책 분야 (드롭다운: AI, 데이터, 클라우드, 보안, 디지털정부)
+- 정책명 (텍스트 입력)
+- 주요 내용 (텍스트 영역, 키워드나 핵심 내용 입력)
+- 대상 독자 (드롭다운: 장관급, 국장급, 실무자)
+
+출력:
+- 브리핑 문서 형식으로 정리된 결과
+  - 제목
+  - 요약 (3줄 이내)
+  - 배경 및 필요성
+  - 주요 내용 (번호 매기기)
+  - 기대 효과
+  - 향후 계획
+
+디자인:
+- 공문서 느낌의 깔끔한 디자인
+- A4 인쇄 시에도 깔끔하게 나오도록
+
+참고: AI API 호출 없이, 입력된 내용을 템플릿에 맞춰 재구성하는 방식으로 구현해주세요.</pre>
+      </div>
+
+      <h3>Step 2: 인쇄 및 PDF 저장 기능</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 기능을 추가해주세요:
+1. "인쇄하기" 버튼 — 브리핑 문서만 깔끔하게 인쇄
+2. 인쇄 시 입력 폼은 숨기고 결과만 출력
+3. 인쇄용 CSS (@media print) 적용
+4. 문서 상단에 "정책 브리핑" 헤더와 생성 날짜 자동 표시</pre>
+      </div>
+
+      <!-- Case 3-3 -->
+      <h2 id="case-3-3">사례 3-3: 다국어 문서 번역 도우미</h2>
+      <div class="case-card">
+        <div class="case-card-meta">
+          <span class="tool-badge gemini">Gemini</span>
+          <span class="badge beginner">초급</span>
+          <span class="module-time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            15분
+          </span>
+        </div>
+        <p style="margin-top: 12px;">한국어 문서를 여러 언어로 번역하는 도우미 웹 도구를 만듭니다.</p>
+      </div>
+
+      <h3>Step 1: 번역 도우미 인터페이스</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다국어 문서 번역 도우미 웹페이지를 만들어주세요.
+
+기능:
+- 왼쪽: 원문 입력 영역 (한국어)
+- 가운데: 언어 선택 버튼들 (영어, 일본어, 중국어, 스페인어)
+- 오른쪽: 번역 결과 표시 영역
+- "번역하기" 버튼
+- "복사하기" 버튼
+
+참고: 실제 번역 API 없이, 데모용으로 간단한 예제 번역 데이터를
+JavaScript 객체에 미리 넣어두고, 그 외 입력은
+"[번역 중... 실제 사용 시 AI API를 연결하세요]" 메시지를 표시해주세요.
+
+디자인:
+- Google 번역과 유사한 깔끔한 레이아웃
+- 언어 버튼은 선택 시 활성화 표시
+- 모바일 반응형</pre>
+      </div>
+
+      <h3>Step 2: 번역 옵션 추가</h3>
+
+      <div class="prompt-block">
+        <div class="prompt-header">
+          <span class="prompt-label">프롬프트</span>
+          <button class="copy-btn">복사</button>
+        </div>
+        <pre class="prompt-content">다음 기능을 추가해주세요:
+1. 번역 스타일 선택 (격식체/비격식체/비즈니스)
+2. 글자 수 카운터 (원문, 번역문 각각)
+3. 번역 히스토리 (최근 5개 번역 목록, 클릭 시 다시 불러오기)
+4. 원문/번역문 좌우 스왑 버튼</pre>
+      </div>
+
+      <!-- Tips -->
+      <h2 id="tips">팁 & 트러블슈팅</h2>
+
+      <div class="track-tabs">
+        <button class="tab active" data-track="nondev-tips3">비개발자 팁</button>
+        <button class="tab" data-track="dev-tips3">개발자 심화</button>
+      </div>
+      <div class="tab-content" data-track="nondev-tips3">
+        <ul>
+          <li>회의록 정리기는 실제 업무에 바로 활용 가능합니다. 복사한 HTML 파일을 즐겨찾기에 저장해두세요</li>
+          <li>정책 브리핑 생성기의 템플릿을 자기 부서에 맞게 수정 요청하세요</li>
+          <li>"○○부서에서 사용하는 양식에 맞춰줘"라고 구체적으로 요청하면 더 좋은 결과를 얻습니다</li>
+        </ul>
+      </div>
+      <div class="tab-content hidden" data-track="dev-tips3">
+        <p>실제 AI API(Claude API, Gemini API)를 연결하면 진짜 AI 기반 정리/번역이 가능합니다.</p>
+        <div class="prompt-block">
+          <div class="prompt-header">
+            <span class="prompt-label">심화 프롬프트: Claude API 연결</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="prompt-content">이 회의록 정리기에 Claude API를 연결해줘.
+API 키를 환경변수에서 읽고, 서버 사이드에서 호출하도록 해줘.
+프롬프트는 "다음 회의 내용을 구조화된 형태로 정리해줘..."로 시작해줘.</pre>
+        </div>
+      </div>
+
+      <h3>트러블슈팅</h3>
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            텍스트를 붙여넣었는데 정리가 안 돼요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>키워드 기반 파싱이므로 "결정:", "참석:", "다음 할 일:" 등의 키워드가 포함되어야 합니다. AI에게 "키워드 없이도 문맥으로 분류하도록 로직을 개선해줘"라고 요청해보세요.</p>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            인쇄하면 레이아웃이 깨져요
+            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <p>인쇄 미리보기에서 여백을 '없음'으로 설정해보세요. "@media print CSS를 더 상세하게 설정해줘"라고 AI에게 요청하세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Navigation -->
+      <div class="module-nav">
+        <a href="module-02.html" class="module-nav-link prev">
+          <span class="module-nav-label">&larr; 이전 모듈</span>
+          <span class="module-nav-title">첫 번째 성공 경험 — 나만의 웹페이지 만들기</span>
+        </a>
+        <a href="module-04.html" class="module-nav-link next">
+          <span class="module-nav-label">다음 모듈 &rarr;</span>
+          <span class="module-nav-title">데이터를 눈에 보이게 — 시각화와 분석</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-logo">NIA 한국지능정보사회진흥원</span>
+      <span class="footer-text">AI와 함께하는 Vibe Coding 실무 워크숍</span>
+    </div>
+  </footer>
+
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+</body>
+</html>
