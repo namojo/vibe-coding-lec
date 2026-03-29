@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설문조사 결과 분석 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f0f4f8; color: #1a202c; }
+.header { background: linear-gradient(135deg, #059669, #0d9488); color: white; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.header h1 { font-size: 1.6rem; }
+.header-actions { display: flex; gap: 0.75rem; }
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-white { background: rgba(255,255,255,0.2); color: white; }
+.btn-white:hover { background: rgba(255,255,255,0.35); }
+.btn-solid { background: white; color: #059669; }
+.btn-solid:hover { background: #f0fdf4; }
+.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+/* 요약 카드 */
+.summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.summary-card { background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.summary-card .label { font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+.summary-card .value { font-size: 2rem; font-weight: 700; margin: 0.25rem 0; }
+.summary-card .sub { font-size: 0.8rem; color: #9ca3af; }
+.sc-blue .value { color: #2563eb; }
+.sc-green .value { color: #059669; }
+.sc-purple .value { color: #7c3aed; }
+.sc-orange .value { color: #ea580c; }
+
+/* 차트 그리드 */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+@media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+.chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.chart-card h3 { font-size: 1rem; color: #374151; margin-bottom: 1rem; }
+.chart-card.full { grid-column: 1 / -1; }
+
+/* 슬라이드 패널 */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.overlay.active { opacity: 1; pointer-events: auto; }
+.edit-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 420px; max-width: 90vw; background: white; z-index: 101; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -4px 0 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+.edit-panel.active { transform: translateX(0); }
+.panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+.panel-header h3 { font-size: 1.1rem; }
+.panel-close { width: 32px; height: 32px; border: none; background: #f3f4f6; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
+.panel-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
+.edit-item { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid #f3f4f6; }
+.edit-item label { display: block; font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+.edit-scores { display: flex; gap: 0.4rem; }
+.edit-scores input { width: 48px; padding: 0.4rem; text-align: center; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; }
+.edit-scores span { font-size: 0.7rem; color: #9ca3af; text-align: center; display: block; }
+.panel-footer { padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display: flex; gap: 0.75rem; }
+.btn-primary { background: #059669; color: white; }
+.btn-primary:hover { background: #047857; }
+.btn-cancel { background: #f3f4f6; color: #374151; }
+.btn-cancel:hover { background: #e5e7eb; }
+
+/* 인쇄 */
+@media print {
+    .header-actions, .overlay, .edit-panel, .no-print { display: none !important; }
+    .header { background: #059669 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: white; }
+    .chart-card, .summary-card { box-shadow: none; border: 1px solid #e5e7eb; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1>설문조사 결과 분석</h1>
+        <p style="opacity:0.85; font-size:0.9rem; margin-top:0.25rem;">2024년 하반기 고객 만족도 조사</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-white" onclick="openEditPanel()">데이터 편집</button>
+        <button class="btn btn-white" onclick="generateReport()">보고서 생성</button>
+        <button class="btn btn-solid" onclick="window.print()">인쇄</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="summary-cards" id="summaryCards"></div>
+    <div class="chart-grid">
+        <div class="chart-card">
+            <h3>문항별 평균 점수</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>전체 만족도 분포</h3>
+            <canvas id="donutChart"></canvas>
+        </div>
+        <div class="chart-card full">
+            <h3>항목별 레이더 분석</h3>
+            <div style="max-width:500px; margin:0 auto;">
+                <canvas id="radarChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div id="reportArea" style="display:none;"></div>
+</div>
+
+<!-- 편집 패널 -->
+<div class="overlay" id="overlay" onclick="closeEditPanel()"></div>
+<div class="edit-panel" id="editPanel">
+    <div class="panel-header">
+        <h3>데이터 편집</h3>
+        <button class="panel-close" onclick="closeEditPanel()">&times;</button>
+    </div>
+    <div class="panel-body" id="editBody"></div>
+    <div class="panel-footer">
+        <button class="btn btn-primary" onclick="applyEdit()" style="flex:1">적용</button>
+        <button class="btn btn-cancel" onclick="closeEditPanel()">취소</button>
+    </div>
+</div>
+
+<script>
+// 설문 데이터
+let surveyData = {
+    title: '2024년 하반기 고객 만족도 조사',
+    totalRespondents: 482,
+    questions: [
+        { id: 1, text: '서비스 품질', scores: { '매우만족': 142, '만족': 186, '보통': 98, '불만족': 38, '매우불만족': 18 } },
+        { id: 2, text: '응대 친절도', scores: { '매우만족': 168, '만족': 172, '보통': 87, '불만족': 35, '매우불만족': 20 } },
+        { id: 3, text: '처리 신속성', scores: { '매우만족': 95, '만족': 148, '보통': 132, '불만족': 72, '매우불만족': 35 } },
+        { id: 4, text: '정보 정확성', scores: { '매우만족': 156, '만족': 178, '보통': 92, '불만족': 40, '매우불만족': 16 } },
+        { id: 5, text: '접근 편의성', scores: { '매우만족': 112, '만족': 165, '보통': 118, '불만족': 58, '매우불만족': 29 } },
+        { id: 6, text: '전반적 만족도', scores: { '매우만족': 135, '만족': 180, '보통': 102, '불만족': 42, '매우불만족': 23 } }
+    ]
+};
+
+const scoreWeights = { '매우만족': 5, '만족': 4, '보통': 3, '불만족': 2, '매우불만족': 1 };
+const scoreColors = { '매우만족': '#059669', '만족': '#34d399', '보통': '#fbbf24', '불만족': '#f87171', '매우불만족': '#dc2626' };
+const scoreKeys = ['매우만족', '만족', '보통', '불만족', '매우불만족'];
+
+let charts = {};
+
+function calcAvg(q) {
+    let sum = 0, count = 0;
+    for (const [k, v] of Object.entries(q.scores)) {
+        sum += scoreWeights[k] * v;
+        count += v;
+    }
+    return count ? (sum / count) : 0;
+}
+
+function calcOverallAvg() {
+    const avgs = surveyData.questions.map(calcAvg);
+    return avgs.reduce((a, b) => a + b, 0) / avgs.length;
+}
+
+function calcSatisfactionRate() {
+    let satisfied = 0, total = 0;
+    surveyData.questions.forEach(q => {
+        satisfied += (q.scores['매우만족'] || 0) + (q.scores['만족'] || 0);
+        Object.values(q.scores).forEach(v => total += v);
+    });
+    return total ? ((satisfied / total) * 100) : 0;
+}
+
+function renderSummary() {
+    const avg = calcOverallAvg();
+    const rate = calcSatisfactionRate();
+    const bestQ = surveyData.questions.reduce((a, b) => calcAvg(a) > calcAvg(b) ? a : b);
+    document.getElementById('summaryCards').innerHTML = `
+        <div class="summary-card sc-blue">
+            <div class="label">총 응답자</div>
+            <div class="value">${surveyData.totalRespondents.toLocaleString()}</div>
+            <div class="sub">명</div>
+        </div>
+        <div class="summary-card sc-green">
+            <div class="label">평균 만족도</div>
+            <div class="value">${avg.toFixed(1)}</div>
+            <div class="sub">/ 5.0점</div>
+        </div>
+        <div class="summary-card sc-purple">
+            <div class="label">만족 비율</div>
+            <div class="value">${rate.toFixed(1)}%</div>
+            <div class="sub">만족+매우만족</div>
+        </div>
+        <div class="summary-card sc-orange">
+            <div class="label">최고 항목</div>
+            <div class="value" style="font-size:1.4rem">${bestQ.text}</div>
+            <div class="sub">${calcAvg(bestQ).toFixed(2)}점</div>
+        </div>
+    `;
+}
+
+function renderCharts() {
+    // 수평 막대
+    if (charts.bar) charts.bar.destroy();
+    const barLabels = surveyData.questions.map(q => q.text);
+    const barDatasets = scoreKeys.map(k => ({
+        label: k,
+        data: surveyData.questions.map(q => q.scores[k] || 0),
+        backgroundColor: scoreColors[k]
+    }));
+    charts.bar = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: { labels: barLabels, datasets: barDatasets },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}명` } } },
+            scales: { x: { stacked: true, grid: { color: '#f3f4f6' } }, y: { stacked: true, grid: { display: false } } }
+        }
+    });
+
+    // 도넛
+    if (charts.donut) charts.donut.destroy();
+    const totals = {};
+    scoreKeys.forEach(k => totals[k] = 0);
+    surveyData.questions.forEach(q => scoreKeys.forEach(k => totals[k] += (q.scores[k] || 0)));
+    charts.donut = new Chart(document.getElementById('donutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: scoreKeys,
+            datasets: [{ data: scoreKeys.map(k => totals[k]), backgroundColor: scoreKeys.map(k => scoreColors[k]), borderWidth: 2, borderColor: '#fff' }]
+        },
+        options: {
+            responsive: true,
+            cutout: '55%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}명 (${((ctx.raw / Object.values(totals).reduce((a,b)=>a+b,0)) * 100).toFixed(1)}%)` } } }
+        }
+    });
+
+    // 레이더
+    if (charts.radar) charts.radar.destroy();
+    charts.radar = new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+            labels: surveyData.questions.map(q => q.text),
+            datasets: [{
+                label: '평균 점수',
+                data: surveyData.questions.map(calcAvg),
+                backgroundColor: 'rgba(5,150,105,0.15)',
+                borderColor: '#059669',
+                borderWidth: 2,
+                pointBackgroundColor: '#059669',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1, font: { size: 10 } }, pointLabels: { font: { size: 12 } } } },
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toFixed(2)}점` } } }
+        }
+    });
+}
+
+// 편집 패널
+function openEditPanel() {
+    const body = document.getElementById('editBody');
+    body.innerHTML = surveyData.questions.map(q => `
+        <div class="edit-item">
+            <label>${q.id}. ${q.text}</label>
+            <div class="edit-scores">
+                ${scoreKeys.map(k => `<div><input type="number" min="0" data-qid="${q.id}" data-key="${k}" value="${q.scores[k] || 0}"><span>${k.replace('매우','매우<br>')}</span></div>`).join('')}
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('editPanel').classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+}
+
+function closeEditPanel() {
+    document.getElementById('editPanel').classList.remove('active');
+    document.getElementById('overlay').classList.remove('active');
+}
+
+function applyEdit() {
+    document.querySelectorAll('#editBody input[type="number"]').forEach(inp => {
+        const qid = parseInt(inp.dataset.qid);
+        const key = inp.dataset.key;
+        const q = surveyData.questions.find(q => q.id === qid);
+        if (q) q.scores[key] = parseInt(inp.value) || 0;
+    });
+    // 총 응답자 재계산
+    const total = Object.values(surveyData.questions[0].scores).reduce((a, b) => a + b, 0);
+    surveyData.totalRespondents = total;
+    closeEditPanel();
+    renderAll();
+}
+
+function generateReport() {
+    const avg = calcOverallAvg();
+    const rate = calcSatisfactionRate();
+    const bestQ = surveyData.questions.reduce((a, b) => calcAvg(a) > calcAvg(b) ? a : b);
+    const worstQ = surveyData.questions.reduce((a, b) => calcAvg(a) < calcAvg(b) ? a : b);
+
+    const report = document.getElementById('reportArea');
+    report.style.display = 'block';
+    report.innerHTML = `
+        <div class="chart-card" style="margin-top:1rem;">
+            <h3>분석 보고서</h3>
+            <div style="line-height:1.8; font-size:0.95rem; color:#374151;">
+                <p><strong>${surveyData.title}</strong> 결과를 분석한 보고서입니다.</p>
+                <br>
+                <p><strong>1. 개요</strong></p>
+                <p>총 <strong>${surveyData.totalRespondents}명</strong>이 응답하였으며, 전체 평균 만족도는 <strong>${avg.toFixed(2)}점</strong> (5점 만점)입니다.</p>
+                <p>만족 이상(만족+매우만족) 비율은 <strong>${rate.toFixed(1)}%</strong>입니다.</p>
+                <br>
+                <p><strong>2. 항목별 분석</strong></p>
+                <ul style="padding-left:1.5rem;">
+                    ${surveyData.questions.map(q => `<li>${q.text}: ${calcAvg(q).toFixed(2)}점</li>`).join('')}
+                </ul>
+                <br>
+                <p><strong>3. 주요 시사점</strong></p>
+                <ul style="padding-left:1.5rem;">
+                    <li>최고 만족 항목: <strong>${bestQ.text}</strong> (${calcAvg(bestQ).toFixed(2)}점)</li>
+                    <li>개선 필요 항목: <strong>${worstQ.text}</strong> (${calcAvg(worstQ).toFixed(2)}점)</li>
+                    <li>전반적으로 ${avg >= 3.5 ? '양호한' : '개선이 필요한'} 수준입니다.</li>
+                </ul>
+            </div>
+            <div class="no-print" style="margin-top:1rem;">
+                <button class="btn btn-primary" onclick="window.print()">보고서 인쇄</button>
+            </div>
+        </div>
+    `;
+    report.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderAll() {
+    renderSummary();
+    renderCharts();
+}
+
+renderAll();
+</script>
+</body>
+</html>

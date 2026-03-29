@@ -1,0 +1,47 @@
+[
+  {
+    "id": "sch-001",
+    "title": "부서 주간회의",
+    "time": "09:30",
+    "location": "3층 회의실A",
+    "recurring": true,
+    "days": ["월"],
+    "description": "주간 업무 보고 및 이슈 공유"
+  },
+  {
+    "id": "sch-002",
+    "title": "AI 활용 교육",
+    "time": "14:00",
+    "location": "교육장 B동 201호",
+    "recurring": false,
+    "date": "2026-04-02",
+    "description": "전 직원 대상 AI 도구 활용 교육"
+  },
+  {
+    "id": "sch-003",
+    "title": "점심 브리핑",
+    "time": "12:00",
+    "location": "구내식당 세미나실",
+    "recurring": true,
+    "days": ["수"],
+    "description": "수요 점심 브리핑 (자율 참석)"
+  },
+  {
+    "id": "sch-004",
+    "title": "월간 성과 보고",
+    "time": "10:00",
+    "location": "대회의실",
+    "recurring": false,
+    "date": "2026-04-01",
+    "description": "3월 성과 및 4월 계획 보고"
+  },
+  {
+    "id": "sch-005",
+    "title": "코드 리뷰 세션",
+    "time": "16:00",
+    "location": "온라인 (Teams)",
+    "recurring": true,
+    "days": ["금"],
+    "description": "주간 코드 리뷰 및 기술 공유"
+  }
+]

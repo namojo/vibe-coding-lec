@@ -1,0 +1,15 @@
+{
+  "name": "notification-bot",
+  "version": "1.0.0",
+  "description": "Slack/Teams 알림봇 - 일정 및 마감일 모니터링",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "check": "node bot.js --check",
+    "test-notify": "node bot.js --send-test",
+    "list": "node bot.js --list-schedules",
+    "server": "node server.js"
+  },
+  "keywords": ["notification", "bot", "slack", "teams", "webhook"],
+  "license": "MIT"
+}

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회의록 자동 정리기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* 헤더 */
+  header {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    padding: 24px 32px;
+    text-align: center;
+  }
+
+  header h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  header p  { font-size: 0.9rem; color: rgba(255,255,255,.75); }
+
+  /* 메인 레이아웃 */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 28px auto;
+    padding: 0 20px;
+  }
+
+  .panel {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e8eaed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-header h2 { font-size: 1.05rem; color: #1e293b; }
+
+  .panel-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+
+  textarea {
+    width: 100%;
+    flex: 1;
+    min-height: 400px;
+    border: 1px solid #dde0e4;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    resize: vertical;
+    font-family: inherit;
+    color: #333;
+    transition: border-color .2s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  }
+
+  /* 버튼 */
+  .btn-row {
+    display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+  }
+  .btn-secondary:hover { background: #e2e8f0; }
+
+  .btn-example {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  .btn-example:hover { background: #fde68a; }
+
+  /* 출력 영역 */
+  .output {
+    min-height: 400px;
+    padding: 4px;
+  }
+
+  .output-empty {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 400px;
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+
+  .output h3 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .output h3:first-child { margin-top: 0; }
+
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 4px;
+  }
+
+  .meta-table td {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .meta-table td:first-child {
+    font-weight: 600;
+    color: #475569;
+    width: 100px;
+  }
+
+  .item-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .item-list li {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    border-left: 3px solid #2563eb;
+    margin-bottom: 8px;
+    background: #f8fafc;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .item-list.decisions li { border-left-color: #16a34a; }
+  .item-list.todos li    { border-left-color: #ea580c; }
+
+  .discussion-item {
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+
+  .discussion-item strong { color: #2563eb; }
+
+  /* 토스트 */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    transition: transform .3s ease;
+    z-index: 100;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    textarea { min-height: 250px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>회의록 자동 정리기</h1>
+  <p>회의 내용을 붙여넣으면 구조화된 회의록으로 자동 정리합니다</p>
+</header>
+
+<div class="main">
+  <!-- 입력 패널 -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>회의 내용 입력</h2>
+    </div>
+    <div class="panel-body">
+      <textarea id="input" placeholder="회의 내용을 자유롭게 입력하세요.&#10;&#10;키워드 예시:&#10;- 일시: 2025-03-15&#10;- 참석: 홍길동, 김서연&#10;- 안건: 회의 주제&#10;- 결정: 결정 사항&#10;- 다음 할 일: 해야 할 일"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="parseMinutes()">정리하기</button>
+        <button class="btn btn-example" onclick="loadExample()">예제 불러오기</button>
+        <button class="btn btn-secondary" onclick="resetAll()">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 출력 패널 -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>정리된 회의록</h2>
+      <div class="btn-row" style="margin:0">
+        <button class="btn btn-secondary" onclick="copyHTML()" id="btnCopy">복사하기</button>
+        <button class="btn btn-secondary" onclick="copyMarkdown()">마크다운 복사</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div id="output"><div class="output-empty">왼쪽에 회의 내용을 입력하고 &ldquo;정리하기&rdquo;를 눌러주세요</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EXAMPLE = `일시: 2025년 3월 15일 (금) 14:00-15:30
+장소: NIA 본원 3층 대회의실
+참석: 홍길동(팀장), 김서연, 박준혁, 이수진, 최민호
+
+안건: 2025년 상반기 AI 도입 시범사업 추진 방향
+
+홍길동 팀장이 회의를 개회하며, 상반기 시범사업의 전체 일정을 공유했다.
+
+김서연이 지자체 수요조사 결과를 발표했다. 총 45개 지자체에서 신청했으며, 그 중 교통, 복지, 환경 분야 수요가 가장 높았다. 특히 세종시와 부산시의 스마트시티 연계 수요가 눈에 띄었다.
+
+박준혁이 기술 검증 결과를 보고했다. 국산 AI 모델 3종의 성능 테스트를 완료했으며, 공공 데이터 특화 모델의 정확도가 93%로 가장 높았다.
+
+결정: 1차 시범사업 대상을 세종시, 부산시, 제주도 3개 지자체로 확정한다.
+결정: 국산 AI 모델 중 공공 데이터 특화 모델을 우선 적용한다.
+결정: 시범사업 기간은 4월~9월 (6개월)로 한다.
+
+다음 할 일: 김서연 - 3개 지자체 실무 담당자 미팅 일정 조율 (3/22까지)
+다음 할 일: 박준혁 - AI 모델 커스터마이징 요구사항 정리 (3/25까지)
+다음 할 일: 이수진 - 시범사업 예산 집행 계획서 작성 (3/29까지)
+다음 할 일: 홍길동 - 대외 협력기관 MOU 체결 추진`;
+
+function loadExample() {
+  document.getElementById('input').value = EXAMPLE;
+}
+
+function parseMinutes() {
+  const raw = document.getElementById('input').value.trim();
+  if (!raw) { showToast('회의 내용을 입력해주세요'); return; }
+
+  const lines = raw.split('\n');
+  const meta = {};
+  const discussions = [];
+  const decisions = [];
+  const todos = [];
+
+  const metaKeys = { '일시': 'date', '장소': 'place', '참석': 'attendees', '안건': 'agenda' };
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    // meta
+    for (const [k, v] of Object.entries(metaKeys)) {
+      if (trimmed.startsWith(k + ':') || trimmed.startsWith(k + '：')) {
+        meta[v] = trimmed.substring(trimmed.indexOf(':') + 1).trim() || trimmed.substring(trimmed.indexOf('：') + 1).trim();
+        return;
+      }
+    }
+
+    if (trimmed.startsWith('결정:') || trimmed.startsWith('결정：')) {
+      decisions.push(trimmed.replace(/^결정[:：]\s*/, ''));
+    } else if (trimmed.startsWith('다음 할 일:') || trimmed.startsWith('다음 할 일：') || trimmed.startsWith('할 일:')) {
+      todos.push(trimmed.replace(/^(다음 )?할 일[:：]\s*/, ''));
+    } else if (!Object.keys(metaKeys).some(k => trimmed.startsWith(k + ':'))) {
+      if (trimmed.length > 5) discussions.push(trimmed);
+    }
+  });
+
+  // render
+  let html = '';
+
+  // 기본 정보
+  if (Object.keys(meta).length) {
+    html += '<h3>기본 정보</h3><table class="meta-table">';
+    if (meta.date) html += `<tr><td>일시</td><td>${esc(meta.date)}</td></tr>`;
+    if (meta.place) html += `<tr><td>장소</td><td>${esc(meta.place)}</td></tr>`;
+    if (meta.attendees) html += `<tr><td>참석자</td><td>${esc(meta.attendees)}</td></tr>`;
+    if (meta.agenda) html += `<tr><td>안건</td><td>${esc(meta.agenda)}</td></tr>`;
+    html += '</table>';
+  }
+
+  if (discussions.length) {
+    html += '<h3>논의 내용</h3>';
+    discussions.forEach(d => {
+      html += `<div class="discussion-item">${esc(d)}</div>`;
+    });
+  }
+
+  if (decisions.length) {
+    html += '<h3>결정 사항</h3><ul class="item-list decisions">';
+    decisions.forEach(d => { html += `<li>${esc(d)}</li>`; });
+    html += '</ul>';
+  }
+
+  if (todos.length) {
+    html += '<h3>다음 할 일 (Action Items)</h3><ul class="item-list todos">';
+    todos.forEach(t => { html += `<li>${esc(t)}</li>`; });
+    html += '</ul>';
+  }
+
+  if (!html) html = '<div class="output-empty">파싱할 수 있는 내용이 없습니다.</div>';
+
+  document.getElementById('output').innerHTML = '<div class="output">' + html + '</div>';
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function resetAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').innerHTML = '<div class="output-empty">왼쪽에 회의 내용을 입력하고 "정리하기"를 눌러주세요</div>';
+}
+
+function copyHTML() {
+  const el = document.getElementById('output');
+  if (el.querySelector('.output-empty')) { showToast('먼저 회의록을 정리해주세요'); return; }
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('복사 완료!'));
+}
+
+function copyMarkdown() {
+  const el = document.getElementById('output');
+  if (el.querySelector('.output-empty')) { showToast('먼저 회의록을 정리해주세요'); return; }
+
+  let md = '# 회의록\n\n';
+  el.querySelectorAll('h3').forEach(h3 => {
+    md += `## ${h3.textContent}\n\n`;
+    let next = h3.nextElementSibling;
+    while (next && next.tagName !== 'H3') {
+      if (next.tagName === 'TABLE') {
+        next.querySelectorAll('tr').forEach(tr => {
+          const cells = tr.querySelectorAll('td');
+          if (cells.length >= 2) md += `- **${cells[0].textContent}**: ${cells[1].textContent}\n`;
+        });
+        md += '\n';
+      } else if (next.tagName === 'UL') {
+        next.querySelectorAll('li').forEach(li => { md += `- ${li.textContent}\n`; });
+        md += '\n';
+      } else if (next.classList.contains('discussion-item')) {
+        md += `- ${next.textContent}\n`;
+      }
+      next = next.nextElementSibling;
+    }
+    if (!md.endsWith('\n\n')) md += '\n';
+  });
+
+  navigator.clipboard.writeText(md).then(() => showToast('마크다운으로 복사 완료!'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+
+</body>
+</html>

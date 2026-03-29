@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이메일 자동 분류/요약 도우미</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 2rem; text-align: center; }
+.header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.header p { opacity: 0.85; font-size: 0.95rem; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #374151; }
+textarea { width: 100%; height: 220px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem; resize: vertical; line-height: 1.6; font-family: inherit; }
+textarea:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #7c3aed; color: white; width: 100%; justify-content: center; margin-top: 1rem; }
+.btn-primary:hover { background: #6d28d9; }
+.btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+.btn-outline { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+.btn-outline:hover { background: #f9fafb; }
+.samples { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.sample-btn { padding: 0.35rem 0.7rem; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; }
+.sample-btn:hover { background: #ede9fe; border-color: #c4b5fd; }
+
+/* 분석 결과 */
+.result { display: none; }
+.result.show { display: block; }
+.result-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.category-badge { padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; }
+.cat-업무요청 { background: #dbeafe; color: #1e40af; }
+.cat-보고 { background: #dcfce7; color: #166534; }
+.cat-공지 { background: #fef3c7; color: #92400e; }
+.cat-일정 { background: #e0e7ff; color: #3730a3; }
+.cat-외부메일 { background: #fce7f3; color: #9d174d; }
+.urgency { font-size: 1.2rem; }
+.urgency-text { font-size: 0.8rem; color: #6b7280; }
+
+.section { margin-bottom: 1.25rem; }
+.section-title { font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+.summary-text { background: #f9fafb; border-left: 3px solid #7c3aed; padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; font-size: 0.9rem; line-height: 1.6; }
+.keywords { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.keyword { padding: 0.25rem 0.6rem; background: #ede9fe; color: #5b21b6; border-radius: 12px; font-size: 0.78rem; font-weight: 500; }
+.action-items { list-style: none; }
+.action-items li { padding: 0.4rem 0; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 0.4rem; }
+.action-items li::before { content: '☐'; color: #7c3aed; font-weight: bold; }
+.reply-template { position: relative; }
+.reply-template textarea { height: 120px; background: #f9fafb; }
+.reply-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+
+/* 이력 */
+.history { margin-top: 1.5rem; }
+.history h3 { font-size: 1rem; margin-bottom: 0.75rem; color: #374151; }
+.history-item { padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer; transition: background 0.15s; }
+.history-item:hover { background: #f9fafb; }
+.history-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+.history-meta .time { font-size: 0.75rem; color: #9ca3af; }
+.history-preview { font-size: 0.82rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty-state { text-align: center; color: #9ca3af; padding: 2rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>이메일 자동 분류/요약 도우미</h1>
+    <p>이메일을 붙여넣으면 자동으로 분류하고 요약합니다</p>
+</div>
+
+<div class="container">
+    <div class="grid">
+        <div>
+            <div class="card">
+                <h2>이메일 본문</h2>
+                <div class="samples">
+                    <button class="sample-btn" onclick="loadSample(0)">업무요청</button>
+                    <button class="sample-btn" onclick="loadSample(1)">보고</button>
+                    <button class="sample-btn" onclick="loadSample(2)">공지</button>
+                    <button class="sample-btn" onclick="loadSample(3)">일정</button>
+                    <button class="sample-btn" onclick="loadSample(4)">외부메일</button>
+                </div>
+                <textarea id="emailInput" placeholder="분석할 이메일 본문을 붙여넣으세요..."></textarea>
+                <button class="btn btn-primary" onclick="analyzeEmail()">분석하기</button>
+            </div>
+
+            <div class="history" id="historySection">
+                <div class="card">
+                    <h3>분석 이력</h3>
+                    <div id="historyList"><div class="empty-state">분석 이력이 없습니다</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <h2>분석 결과</h2>
+                <div id="resultEmpty" class="empty-state">이메일을 입력하고 분석하기 버튼을 클릭하세요</div>
+                <div id="result" class="result">
+                    <div class="result-header">
+                        <span class="category-badge" id="catBadge"></span>
+                        <span class="urgency" id="urgencyIcon"></span>
+                        <span class="urgency-text" id="urgencyText"></span>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">요약</div>
+                        <div class="summary-text" id="summaryText"></div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">핵심 키워드</div>
+                        <div class="keywords" id="keywordsArea"></div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">필요 액션</div>
+                        <ul class="action-items" id="actionItems"></ul>
+                    </div>
+
+                    <div class="section reply-template">
+                        <div class="section-title">추천 응답 템플릿</div>
+                        <textarea id="replyTemplate"></textarea>
+                        <div class="reply-actions">
+                            <button class="btn btn-sm btn-outline" onclick="copyReply()">복사</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const samples = [
+    {
+        text: `제목: [긴급] 3분기 실적 보고서 데이터 요청
+
+김과장님께,
+
+안녕하세요. 경영기획팀 박부장입니다.
+
+금일 오후 3시까지 3분기 실적 관련 아래 데이터를 정리하여 보내주시기 바랍니다.
+
+1. 부서별 매출 실적 (7~9월)
+2. 전년 동기 대비 증감률
+3. 주요 프로젝트별 수익 현황
+
+내일 임원 보고가 예정되어 있어 급하게 요청드립니다.
+엑셀 파일로 정리하여 회신 부탁드립니다.
+
+감사합니다.
+박영수 부장 / 경영기획팀`,
+        category: '업무요청', urgency: 'high',
+        summary: '경영기획팀 박부장이 3분기 실적 데이터(부서별 매출, 전년 대비 증감률, 프로젝트별 수익)를 오늘 오후 3시까지 엑셀로 요청. 내일 임원 보고 예정.',
+        keywords: ['3분기 실적', '매출 데이터', '임원 보고', '긴급 요청', '엑셀'],
+        actions: ['부서별 매출 실적 데이터 취합 (7~9월)', '전년 동기 대비 증감률 산출', '프로젝트별 수익 현황 정리', '엑셀 파일 작성 후 오후 3시 전 회신'],
+        reply: `박부장님, 안녕하세요.\n\n요청하신 3분기 실적 데이터 건 확인하였습니다.\n오후 3시 이전까지 정리하여 회신드리겠습니다.\n\n감사합니다.\n김과장 드림`
+    },
+    {
+        text: `제목: [보고] 11월 마케팅 캠페인 성과 보고
+
+팀장님께,
+
+11월 마케팅 캠페인 성과를 보고드립니다.
+
+■ 주요 성과
+- 총 노출: 2,450,000회 (목표 대비 112%)
+- 클릭률: 3.2% (업계 평균 2.1% 상회)
+- 전환율: 1.8% (전월 대비 0.3%p 상승)
+- 신규 가입자: 1,284명
+
+■ 채널별 성과
+- SNS 광고: ROI 320%
+- 검색 광고: ROI 280%
+- 이메일 마케팅: 오픈율 24.5%
+
+■ 향후 계획
+12월에는 연말 프로모션에 집중하여 전환율 2.0% 달성을 목표로 합니다.
+
+마케팅팀 이수진 대리`,
+        category: '보고', urgency: 'low',
+        summary: '11월 마케팅 캠페인 성과 보고. 총 노출 245만회(목표 112% 달성), 클릭률 3.2%, 전환율 1.8%. SNS 광고 ROI 320%로 가장 높은 성과.',
+        keywords: ['마케팅 성과', 'ROI', '전환율', 'SNS 광고', '캠페인'],
+        actions: ['성과 데이터 검토 및 피드백', '12월 프로모션 계획 승인 검토', '예산 배분 조정 여부 결정'],
+        reply: `이수진 대리님, 보고 감사합니다.\n\n11월 캠페인 성과가 좋네요. 특히 SNS 광고 ROI가 인상적입니다.\n12월 프로모션 계획에 대해 별도로 미팅을 잡겠습니다.\n\n수고하셨습니다.`
+    },
+    {
+        text: `제목: [공지] 사내 정보보안 교육 필수 이수 안내
+
+전 직원 여러분께,
+
+2024년 하반기 정보보안 교육을 아래와 같이 실시하오니,
+기한 내 필수 이수하여 주시기 바랍니다.
+
+■ 교육 기간: 2024.11.15(금) ~ 2024.11.29(금)
+■ 교육 방법: 사내 LMS (learning.company.co.kr)
+■ 교육 시간: 약 40분
+■ 대상: 전 직원 (계약직 포함)
+
+※ 미이수 시 인사평가에 반영될 수 있으니 반드시 이수해 주세요.
+※ 문의: 정보보안팀 (내선 5500)
+
+정보보안팀 드림`,
+        category: '공지', urgency: 'medium',
+        summary: '사내 정보보안 교육 필수 이수 공지. 11/15~11/29 기간 내 LMS를 통해 40분 교육 이수 필요. 미이수 시 인사평가 반영.',
+        keywords: ['정보보안', '필수 교육', 'LMS', '인사평가', '전 직원'],
+        actions: ['사내 LMS 접속하여 교육 이수', '11/29까지 완료 확인', '팀원들에게 교육 이수 독려'],
+        reply: `안녕하세요, 정보보안팀.\n\n공지 확인하였습니다. 기한 내 이수하겠습니다.\n팀원들에게도 안내하겠습니다.\n\n감사합니다.`
+    },
+    {
+        text: `제목: 12월 부서 회식 및 연말 행사 일정 안내
+
+안녕하세요, 총무팀입니다.
+
+12월 주요 일정을 안내드립니다.
+
+1. 부서 회식
+   - 일시: 12/13(금) 18:30
+   - 장소: 강남 '한우명가' (예약 완료)
+   - 참석 여부를 12/6(금)까지 회신 부탁드립니다.
+
+2. 연말 시상식 & 송년회
+   - 일시: 12/27(금) 16:00~
+   - 장소: 본사 대강당
+   - 복장: 비즈니스 캐주얼
+
+3. 연차 사용 안내
+   - 잔여 연차는 12/31까지 사용 권장
+   - 이월 가능 일수: 최대 5일
+
+총무팀 김민호`,
+        category: '일정', urgency: 'low',
+        summary: '12월 일정 안내: 12/13 부서 회식(강남 한우명가), 12/27 연말 시상식&송년회(본사 대강당), 잔여 연차 12/31까지 사용 권장.',
+        keywords: ['회식', '송년회', '연차', '12월 일정', '참석 여부'],
+        actions: ['12/6까지 회식 참석 여부 회신', '12/27 시상식 일정 캘린더 등록', '잔여 연차 확인 및 사용 계획 수립'],
+        reply: `김민호님, 안내 감사합니다.\n\n12/13 회식 참석하겠습니다.\n시상식 일정도 확인하였습니다.\n\n감사합니다.`
+    },
+    {
+        text: `제목: [파트너십 제안] AI 솔루션 협업 논의 요청
+
+안녕하세요, ABC테크 사업개발팀 정하늘입니다.
+
+귀사의 디지털 전환 사업에 관심을 갖고 연락드립니다.
+
+저희 ABC테크는 국내 AI 솔루션 전문 기업으로,
+문서 자동화 및 데이터 분석 분야에서 다수의 공공기관
+프로젝트를 수행한 바 있습니다.
+
+귀사와의 협업을 통해 시너지를 창출할 수 있을 것으로
+기대하며, 편하신 시간에 미팅을 제안드립니다.
+
+첨부: 회사소개서, 솔루션 브로셔
+
+정하늘 과장
+ABC테크 사업개발팀
+02-1234-5678
+haneul.jung@abctech.co.kr`,
+        category: '외부메일', urgency: 'low',
+        summary: 'ABC테크에서 AI 솔루션(문서 자동화, 데이터 분석) 협업 제안. 공공기관 프로젝트 경험 보유. 미팅 요청.',
+        keywords: ['파트너십', 'AI 솔루션', '문서 자동화', '협업 제안', '외부업체'],
+        actions: ['회사소개서 및 브로셔 검토', '협업 필요성 내부 검토', '관심 시 미팅 일정 조율 회신'],
+        reply: `정하늘 과장님, 안녕하세요.\n\n파트너십 제안 메일 잘 받았습니다.\n보내주신 자료 검토 후 내부 논의를 거쳐 \n회신드리겠습니다.\n\n감사합니다.`
+    }
+];
+
+let history = JSON.parse(localStorage.getItem('emailHistory') || '[]');
+
+function loadSample(idx) {
+    document.getElementById('emailInput').value = samples[idx].text;
+}
+
+function analyzeEmail() {
+    const text = document.getElementById('emailInput').value.trim();
+    if (!text) { alert('이메일 본문을 입력해주세요.'); return; }
+
+    // 키워드 기반 분류 로직
+    const result = classifyEmail(text);
+    displayResult(result);
+    saveHistory(text, result);
+}
+
+function classifyEmail(text) {
+    const lower = text.toLowerCase();
+
+    // 먼저 예제 데이터에서 매칭 시도
+    for (const s of samples) {
+        if (text.includes(s.text.substring(10, 50))) return { ...s };
+    }
+
+    // 규칙 기반 분류
+    let category = '업무요청';
+    let urgency = 'medium';
+
+    if (/\[공지\]|공지|안내드립니다|알려드립니다/.test(text)) category = '공지';
+    else if (/\[보고\]|보고드립니다|성과|실적.*보고|결과.*보고/.test(text)) category = '보고';
+    else if (/일정|회의|미팅|회식|행사|교육.*일정/.test(text)) category = '일정';
+    else if (/제안|협업|파트너|외부|귀사/.test(text)) category = '외부메일';
+    else if (/요청|부탁|보내주|제출|작성해/.test(text)) category = '업무요청';
+
+    if (/긴급|urgent|즉시|바로|오늘.*까지|금일/.test(lower)) urgency = 'high';
+    else if (/내일|이번 주|금주|빠른/.test(text)) urgency = 'medium';
+    else urgency = 'low';
+
+    // 요약 생성 (첫 문장 + 핵심)
+    const lines = text.split('\n').filter(l => l.trim() && !l.startsWith('제목'));
+    const summary = lines.slice(0, 3).join(' ').substring(0, 150) + '...';
+
+    // 키워드 추출
+    const keywords = extractKeywords(text);
+
+    // 액션 아이템
+    const actions = extractActions(text);
+
+    // 응답 템플릿
+    const reply = generateReplyTemplate(category, text);
+
+    return { category, urgency, summary, keywords, actions, reply, text };
+}
+
+function extractKeywords(text) {
+    const stopwords = ['안녕하세요','감사합니다','부탁드립니다','있습니다','입니다','합니다','됩니다','주세요','드립니다','대한','통해','위해','에서','으로','에게','까지','부터','관련','해주','바랍니다','것으로'];
+    const words = text.replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g, '').split(/\s+/).filter(w => w.length >= 2 && !stopwords.some(s => w.includes(s)));
+    const freq = {};
+    words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+    return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 5).map(e => e[0]);
+}
+
+function extractActions(text) {
+    const actions = [];
+    const lines = text.split('\n');
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        if (/^\d+[\.\)]\s/.test(trimmed) || /^[-■●]\s/.test(trimmed)) {
+            actions.push(trimmed.replace(/^[\d\.\)\-■●\s]+/, '').trim());
+        }
+    });
+    if (actions.length === 0) {
+        if (/회신|답변/.test(text)) actions.push('메일 회신');
+        if (/검토|확인/.test(text)) actions.push('내용 검토 및 확인');
+        if (/보고|제출/.test(text)) actions.push('관련 자료 준비');
+        if (actions.length === 0) actions.push('내용 확인 후 적절한 조치');
+    }
+    return actions.slice(0, 5);
+}
+
+function generateReplyTemplate(category, text) {
+    const templates = {
+        '업무요청': '안녕하세요.\n\n요청하신 건 확인하였습니다.\n검토 후 회신드리겠습니다.\n\n감사합니다.',
+        '보고': '보고 내용 잘 확인하였습니다.\n수고하셨습니다.\n\n추가 검토 후 피드백 드리겠습니다.',
+        '공지': '공지 확인하였습니다.\n안내에 따라 조치하겠습니다.\n\n감사합니다.',
+        '일정': '일정 확인하였습니다.\n참석(해당 사항)에 대해 회신드립니다.\n\n감사합니다.',
+        '외부메일': '안녕하세요.\n\n메일 잘 받았습니다.\n내부 검토 후 회신드리겠습니다.\n\n감사합니다.'
+    };
+    return templates[category] || templates['업무요청'];
+}
+
+function displayResult(result) {
+    document.getElementById('resultEmpty').style.display = 'none';
+    const el = document.getElementById('result');
+    el.classList.add('show');
+
+    document.getElementById('catBadge').textContent = result.category;
+    document.getElementById('catBadge').className = `category-badge cat-${result.category}`;
+
+    const urgencyMap = { high: { icon: '\uD83D\uDD34', text: '긴급' }, medium: { icon: '\uD83D\uDFE1', text: '보통' }, low: { icon: '\uD83D\uDFE2', text: '낮음' } };
+    const u = urgencyMap[result.urgency];
+    document.getElementById('urgencyIcon').textContent = u.icon;
+    document.getElementById('urgencyText').textContent = `긴급도: ${u.text}`;
+
+    document.getElementById('summaryText').textContent = result.summary;
+
+    document.getElementById('keywordsArea').innerHTML = result.keywords.map(k => `<span class="keyword">${k}</span>`).join('');
+
+    document.getElementById('actionItems').innerHTML = result.actions.map(a => `<li>${a}</li>`).join('');
+
+    document.getElementById('replyTemplate').value = result.reply;
+}
+
+function copyReply() {
+    const ta = document.getElementById('replyTemplate');
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => {
+        const btn = event.target;
+        btn.textContent = '복사됨!';
+        setTimeout(() => btn.textContent = '복사', 1500);
+    });
+}
+
+function saveHistory(text, result) {
+    const entry = {
+        timestamp: new Date().toISOString(),
+        preview: text.substring(0, 80),
+        category: result.category,
+        urgency: result.urgency,
+        text,
+        result
+    };
+    history.unshift(entry);
+    if (history.length > 20) history.pop();
+    localStorage.setItem('emailHistory', JSON.stringify(history));
+    renderHistory();
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (history.length === 0) {
+        list.innerHTML = '<div class="empty-state">분석 이력이 없습니다</div>';
+        return;
+    }
+    list.innerHTML = history.map((h, i) => `
+        <div class="history-item" onclick="loadHistory(${i})">
+            <div class="history-meta">
+                <span class="category-badge cat-${h.category}" style="font-size:0.7rem; padding:0.2rem 0.5rem;">${h.category}</span>
+                <span class="time">${new Date(h.timestamp).toLocaleString('ko-KR')}</span>
+            </div>
+            <div class="history-preview">${h.preview}...</div>
+        </div>
+    `).join('');
+}
+
+function loadHistory(idx) {
+    const h = history[idx];
+    document.getElementById('emailInput').value = h.text;
+    displayResult(h.result);
+}
+
+renderHistory();
+</script>
+</body>
+</html>

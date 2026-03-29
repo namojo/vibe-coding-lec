@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIA 업무 도우미</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: #e8eaf6;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 16px;
+        }
+
+        .chat-app {
+            width: 100%; max-width: 450px; height: 700px;
+            background: #fff; border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,.12);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* 헤더 */
+        .chat-header {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: #fff; padding: 16px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .bot-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .bot-info h2 { font-size: 16px; font-weight: 600; }
+        .bot-info .status { font-size: 12px; opacity: .8; }
+        .header-actions { margin-left: auto; display: flex; gap: 8px; }
+        .header-btn {
+            background: rgba(255,255,255,.15); border: none; color: #fff;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            font-size: 14px; display: flex; align-items: center; justify-content: center;
+        }
+        .header-btn:hover { background: rgba(255,255,255,.25); }
+
+        /* 메시지 영역 */
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            background: #f5f5f5;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+        .message {
+            display: flex; gap: 8px; max-width: 85%; animation: fadeIn .3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        .message.bot { align-self: flex-start; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .message.bot .msg-avatar { background: #1565c0; color: #fff; }
+        .message.user .msg-avatar { background: #e0e0e0; color: #666; }
+
+        .msg-content { display: flex; flex-direction: column; gap: 4px; }
+        .msg-bubble {
+            padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+            word-break: break-word;
+        }
+        .message.bot .msg-bubble {
+            background: #e3f2fd; color: #1a1a1a;
+            border-bottom-left-radius: 4px;
+        }
+        .message.user .msg-bubble {
+            background: #eeeeee; color: #1a1a1a;
+            border-bottom-right-radius: 4px;
+        }
+        .msg-time { font-size: 11px; color: #999; padding: 0 4px; }
+        .message.user .msg-time { text-align: right; }
+
+        /* 입력중 표시 */
+        .typing-indicator {
+            display: none; align-self: flex-start; padding: 8px 14px;
+            background: #e3f2fd; border-radius: 16px; gap: 4px; align-items: center;
+            margin-left: 38px;
+        }
+        .typing-indicator.show { display: flex; }
+        .typing-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #90caf9;
+            animation: typingBounce 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: .2s; }
+        .typing-dot:nth-child(3) { animation-delay: .4s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        /* 빠른 답변 버튼 */
+        .quick-replies {
+            display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px;
+            background: #f5f5f5; border-top: 1px solid #e0e0e0;
+        }
+        .quick-btn {
+            padding: 6px 14px; border: 1px solid #1565c0; border-radius: 16px;
+            background: #fff; color: #1565c0; font-size: 13px; cursor: pointer;
+            transition: all .2s;
+        }
+        .quick-btn:hover { background: #1565c0; color: #fff; }
+
+        /* 입력 영역 */
+        .chat-input {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; background: #fff;
+            border-top: 1px solid #e0e0e0;
+        }
+        .chat-input input {
+            flex: 1; border: 1px solid #e0e0e0; border-radius: 20px;
+            padding: 10px 16px; font-size: 14px; outline: none;
+        }
+        .chat-input input:focus { border-color: #1565c0; }
+        .send-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #1565c0; color: #fff; border: none;
+            cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .send-btn:hover { background: #0d47a1; }
+        .send-btn:disabled { background: #ccc; cursor: default; }
+
+        /* 피드백 */
+        .feedback-btns {
+            display: flex; gap: 4px; margin-top: 4px;
+        }
+        .feedback-btn {
+            padding: 2px 8px; border: 1px solid #e0e0e0; border-radius: 10px;
+            background: #fff; font-size: 12px; cursor: pointer; color: #999;
+        }
+        .feedback-btn:hover { border-color: #1565c0; color: #1565c0; }
+        .feedback-btn.selected { background: #e3f2fd; border-color: #1565c0; color: #1565c0; }
+
+        /* 내보내기 모달 */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
+            z-index: 100; align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #fff; border-radius: 16px; padding: 24px;
+            max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;
+        }
+        .modal h3 { margin-bottom: 12px; }
+        .modal pre {
+            background: #f5f5f5; padding: 12px; border-radius: 8px;
+            font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto;
+        }
+        .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+        .modal-actions button {
+            padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px;
+        }
+        .modal-actions .primary { background: #1565c0; color: #fff; }
+        .modal-actions .secondary { background: #e0e0e0; }
+    </style>
+</head>
+<body>
+
+<div class="chat-app">
+    <div class="chat-header">
+        <div class="bot-avatar">&#129302;</div>
+        <div class="bot-info">
+            <h2>NIA 업무 도우미</h2>
+            <div class="status">&#9679; 온라인</div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="exportChat()" title="대화 내보내기">&#8681;</button>
+            <button class="header-btn" onclick="clearChat()" title="대화 초기화">&#8634;</button>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+
+    <div class="quick-replies" id="quickReplies"></div>
+
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="메시지를 입력하세요..."
+               onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#10148;</button>
+    </div>
+</div>
+
+<!-- 내보내기 모달 -->
+<div class="modal-overlay" id="exportModal">
+    <div class="modal">
+        <h3>대화 내보내기</h3>
+        <pre id="exportContent"></pre>
+        <div class="modal-actions">
+            <button class="secondary" onclick="closeModal()">닫기</button>
+            <button class="primary" onclick="downloadChat()">다운로드</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── 키워드 응답 데이터베이스 ──
+const RESPONSES = {
+    인사: {
+        keywords: ['안녕', '하이', 'hi', 'hello', '반가워', '처음'],
+        response: '안녕하세요! NIA 업무 도우미입니다. 궁금한 것이 있으시면 편하게 물어보세요.',
+        quickReplies: ['회의실 예약', '휴가 신청', '식당 메뉴', '연락처 조회']
+    },
+    회의실: {
+        keywords: ['회의실', '예약', '미팅룸', '회의', '미팅'],
+        response: '회의실 예약 안내입니다.\n\n' +
+            '<b>예약 방법:</b> 그룹웨어 > 자원예약 > 회의실\n\n' +
+            '<b>이용 가능 회의실:</b>\n' +
+            '- 3층 회의실A (8명) - 프로젝터, 화이트보드\n' +
+            '- 3층 회의실B (4명) - 모니터\n' +
+            '- 5층 대회의실 (30명) - 빔프로젝터, 마이크\n' +
+            '- 5층 소회의실 (6명) - 화상회의 장비\n\n' +
+            '예약은 최소 30분 전까지 가능하며, 최대 2시간까지 예약할 수 있습니다.',
+        quickReplies: ['대회의실 장비', '예약 취소 방법', '다른 질문']
+    },
+    휴가: {
+        keywords: ['휴가', '연차', '반차', '병가', '출장', '근태'],
+        response: '휴가/근태 관련 안내입니다.\n\n' +
+            '<b>신청 방법:</b> 그룹웨어 > 근태관리 > 휴가신청\n\n' +
+            '<b>휴가 종류:</b>\n' +
+            '- 연차: 1일 단위 (잔여 연차 내)\n' +
+            '- 반차: 오전(09~13시) / 오후(14~18시)\n' +
+            '- 병가: 진단서 첨부 필요\n' +
+            '- 공가: 사유서 + 증빙자료\n\n' +
+            '<b>주의사항:</b>\n' +
+            '- 3일 이상 연속 사용 시 부서장 사전 승인 필요\n' +
+            '- 반차는 당일 오전 9시까지 신청 가능',
+        quickReplies: ['잔여 연차 확인', '휴가 취소', '다른 질문']
+    },
+    식당: {
+        keywords: ['식당', '메뉴', '점심', '구내식당', '카페', '음식'],
+        response: '오늘의 구내식당 메뉴입니다.\n\n' +
+            '<b>A코너 (한식):</b>\n돼지불백, 된장찌개, 계란말이, 배추김치\n\n' +
+            '<b>B코너 (특선):</b>\n크림파스타, 미니샐러드, 수프\n\n' +
+            '<b>운영 시간:</b>\n' +
+            '- 조식: 07:30~09:00\n' +
+            '- 중식: 11:30~13:30\n' +
+            '- 석식: 17:30~19:00\n\n' +
+            '* 메뉴는 시뮬레이션 데이터입니다.',
+        quickReplies: ['카페 메뉴', '내일 메뉴', '다른 질문']
+    },
+    연락처: {
+        keywords: ['연락처', '전화', '번호', '내선', '담당자', '부서'],
+        response: '주요 부서 연락처입니다.\n\n' +
+            '- 총무과: 내선 1100 (한지민)\n' +
+            '- 기획과: 내선 1200 (김민수)\n' +
+            '- 개발팀: 내선 1300 (박지영)\n' +
+            '- 데이터팀: 내선 1400 (정서연)\n' +
+            '- IT지원: 내선 9999\n' +
+            '- 시설관리: 내선 8888\n\n' +
+            '전체 연락처는 그룹웨어 > 조직도에서 확인하세요.',
+        quickReplies: ['IT지원 요청', '조직도', '다른 질문']
+    },
+    IT지원: {
+        keywords: ['컴퓨터', 'pc', 'IT', '프린터', '네트워크', '비밀번호', '장애', '오류'],
+        response: 'IT 지원 안내입니다.\n\n' +
+            '<b>장애 신고:</b> 내선 9999 또는 그룹웨어 > IT지원 > 장애신고\n\n' +
+            '<b>자주 묻는 문의:</b>\n' +
+            '- 비밀번호 초기화: IT지원팀 내선 9999\n' +
+            '- 프린터 연결: 프린터 IP 10.0.1.100 추가\n' +
+            '- VPN 접속: FortiClient 앱 사용\n' +
+            '- 이메일 설정: IMAP mail.nia.or.kr:993\n\n' +
+            '긴급 장애는 전화 접수를 권장합니다.',
+        quickReplies: ['VPN 설정', '프린터 설치', '다른 질문']
+    },
+    일정: {
+        keywords: ['일정', '캘린더', '스케줄', '행사', '교육'],
+        response: '이번 주 주요 일정입니다.\n\n' +
+            '- 월: 09:30 부서 주간회의 (3층 회의실A)\n' +
+            '- 수: 12:00 점심 브리핑 (세미나실)\n' +
+            '- 목: 14:00 AI 활용 교육 (B동 201호)\n' +
+            '- 금: 16:00 코드 리뷰 세션 (Teams)\n\n' +
+            '전체 일정은 그룹웨어 캘린더를 확인하세요.',
+        quickReplies: ['교육 신청', '회의실 예약', '다른 질문']
+    },
+    감사: {
+        keywords: ['감사', '고마워', '고맙', '땡큐', 'thanks', 'thx', '좋아'],
+        response: '도움이 되었다니 기쁩니다! 다른 궁금한 점이 있으면 언제든 물어보세요.',
+        quickReplies: ['처음으로', '대화 내보내기']
+    },
+    도움말: {
+        keywords: ['도움', '도움말', 'help', '기능', '뭐', '무엇', '어떤', '할 수', '다른 질문', '처음으로'],
+        response: '제가 도와드릴 수 있는 항목입니다.\n\n' +
+            '&#128205; <b>회의실</b> - 예약 방법, 장비 안내\n' +
+            '&#128197; <b>휴가</b> - 연차/반차/병가 신청\n' +
+            '&#127860; <b>식당</b> - 구내식당 메뉴, 운영시간\n' +
+            '&#128222; <b>연락처</b> - 부서/담당자 내선번호\n' +
+            '&#128187; <b>IT지원</b> - PC/네트워크 장애\n' +
+            '&#128198; <b>일정</b> - 주요 행사, 교육\n\n' +
+            '키워드를 입력하거나 아래 버튼을 눌러주세요.',
+        quickReplies: ['회의실 예약', '휴가 신청', '식당 메뉴', '연락처', 'IT지원', '일정']
+    },
+};
+
+const DEFAULT_RESPONSE = {
+    response: '죄송합니다. 해당 내용은 아직 준비 중입니다.\n다른 키워드로 시도해 보시거나, "도움말"을 입력해 주세요.',
+    quickReplies: ['도움말', '연락처', '다른 질문']
+};
+
+// ── 상태 ──
+const STORAGE_KEY = 'nia-chatbot-history';
+let chatHistory = [];
+let feedbackData = [];
+
+// ── 메시지 렌더링 ──
+function getTime() {
+    return new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMessage(text, sender, skipSave) {
+    const messagesEl = document.getElementById('chatMessages');
+    const time = getTime();
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+
+    const avatarText = sender === 'bot' ? '&#129302;' : '&#128100;';
+    msgDiv.innerHTML = `
+        <div class="msg-avatar">${avatarText}</div>
+        <div class="msg-content">
+            <div class="msg-bubble">${text}</div>
+            <div class="msg-time">${time}</div>
+            ${sender === 'bot' ? `
+                <div class="feedback-btns">
+                    <button class="feedback-btn" onclick="giveFeedback(this, 'helpful')">&#128077; 도움됨</button>
+                    <button class="feedback-btn" onclick="giveFeedback(this, 'not-helpful')">&#128078; 아쉬움</button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    messagesEl.appendChild(msgDiv);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    if (!skipSave) {
+        chatHistory.push({ sender, text, time, timestamp: Date.now() });
+        saveHistory();
+    }
+}
+
+function showQuickReplies(replies) {
+    const el = document.getElementById('quickReplies');
+    if (!replies || replies.length === 0) {
+        el.innerHTML = '';
+        return;
+    }
+    el.innerHTML = replies.map(r =>
+        `<button class="quick-btn" onclick="handleQuickReply('${r}')">${r}</button>`
+    ).join('');
+}
+
+function handleQuickReply(text) {
+    if (text === '대화 내보내기') { exportChat(); return; }
+    document.getElementById('userInput').value = text;
+    sendMessage();
+}
+
+// ── 키워드 매칭 ──
+function findResponse(input) {
+    const lower = input.toLowerCase().trim();
+
+    for (const [, data] of Object.entries(RESPONSES)) {
+        if (data.keywords.some(kw => lower.includes(kw))) {
+            return data;
+        }
+    }
+
+    return DEFAULT_RESPONSE;
+}
+
+// ── 메시지 전송 ──
+function sendMessage() {
+    const inputEl = document.getElementById('userInput');
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    inputEl.value = '';
+
+    // 입력중 표시
+    const typingEl = document.getElementById('typingIndicator');
+    typingEl.classList.add('show');
+    document.getElementById('chatMessages').scrollTop =
+        document.getElementById('chatMessages').scrollHeight;
+
+    // 응답 딜레이 (자연스러운 UX)
+    const delay = 500 + Math.random() * 800;
+    setTimeout(() => {
+        typingEl.classList.remove('show');
+        const result = findResponse(text);
+        addMessage(result.response, 'bot');
+        showQuickReplies(result.quickReplies);
+    }, delay);
+}
+
+// ── 피드백 ──
+function giveFeedback(btn, type) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.feedback-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    feedbackData.push({
+        timestamp: Date.now(),
+        type,
+        messageIndex: chatHistory.length - 1,
+    });
+}
+
+// ── 히스토리 저장/로드 ──
+function saveHistory() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+    } catch (e) { /* 무시 */ }
+}
+
+function loadHistory() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            chatHistory = JSON.parse(saved);
+            chatHistory.forEach(msg => addMessage(msg.text, msg.sender, true));
+            return true;
+        }
+    } catch (e) { /* 무시 */ }
+    return false;
+}
+
+// ── 대화 초기화 ──
+function clearChat() {
+    if (!confirm('대화 내역을 모두 삭제하시겠습니까?')) return;
+    chatHistory = [];
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('chatMessages').innerHTML = '';
+    showWelcome();
+}
+
+// ── 대화 내보내기 ──
+function exportChat() {
+    if (chatHistory.length === 0) {
+        alert('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    const text = chatHistory.map(m => {
+        const who = m.sender === 'bot' ? 'NIA 도우미' : '나';
+        const cleanText = m.text.replace(/<[^>]+>/g, '');
+        return `[${m.time}] ${who}: ${cleanText}`;
+    }).join('\n');
+
+    document.getElementById('exportContent').textContent = text;
+    document.getElementById('exportModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('exportModal').classList.remove('show');
+}
+
+function downloadChat() {
+    const text = document.getElementById('exportContent').textContent;
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `NIA대화내역_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeModal();
+}
+
+// ── 환영 메시지 ──
+function showWelcome() {
+    addMessage(
+        '안녕하세요! <b>NIA 업무 도우미</b>입니다.\n' +
+        '회의실 예약, 휴가 신청, 식당 메뉴 등 업무 관련 질문에 답해드립니다.\n\n' +
+        '아래 버튼을 누르거나 키워드를 입력해 보세요!',
+        'bot'
+    );
+    showQuickReplies(['회의실 예약', '휴가 신청', '식당 메뉴', '연락처', '도움말']);
+}
+
+// ── 초기화 ──
+document.getElementById('exportModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+const hasHistory = loadHistory();
+if (!hasHistory) {
+    showWelcome();
+} else {
+    showQuickReplies(['회의실 예약', '휴가 신청', '식당 메뉴', '연락처', '도움말']);
+}
+</script>
+</body>
+</html>

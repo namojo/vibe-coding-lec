@@ -1,0 +1,17 @@
+{
+  "name": "file-organizer",
+  "version": "1.0.0",
+  "description": "파일 정리 CLI 도구 - 확장자/날짜/크기별 자동 분류",
+  "main": "organize.js",
+  "bin": {
+    "organize": "./organize.js"
+  },
+  "scripts": {
+    "start": "node organize.js",
+    "demo": "node organize.js ./test-files --dry-run",
+    "demo-date": "node organize.js ./test-files --by-date --dry-run",
+    "demo-size": "node organize.js ./test-files --by-size --dry-run"
+  },
+  "keywords": ["file", "organizer", "cli", "automation"],
+  "license": "MIT"
+}

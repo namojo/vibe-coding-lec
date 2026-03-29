@@ -1,0 +1,13 @@
+{
+  "name": "report-pipeline",
+  "version": "1.0.0",
+  "description": "보고 자동화 파이프라인 - CSV → 통계 → HTML 보고서",
+  "main": "pipeline.js",
+  "scripts": {
+    "start": "node pipeline.js",
+    "report": "node pipeline.js --open",
+    "report-custom": "node pipeline.js --input data/weekly_2026_w12.csv --output my_report.html"
+  },
+  "keywords": ["report", "pipeline", "csv", "automation"],
+  "license": "MIT"
+}

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다기능 단위 변환기</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #ea580c, #f97316); color: white; padding: 2rem; text-align: center; }
+.header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.header p { opacity: 0.85; font-size: 0.95rem; }
+.container { max-width: 800px; margin: 0 auto; padding: 1.5rem; }
+
+/* 탭 */
+.tabs { display: flex; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.tab { flex: 1; padding: 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; background: white; color: #6b7280; border: none; }
+.tab:hover { background: #fff7ed; }
+.tab.active { color: #ea580c; border-bottom-color: #ea580c; background: white; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.card { background: white; border-radius: 0 0 12px 12px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card-standalone { border-radius: 12px; margin-top: 1rem; }
+
+/* 폼 */
+.converter-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.input-group { flex: 1; min-width: 200px; }
+.input-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #6b7280; margin-bottom: 0.4rem; }
+.input-group input, .input-group select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
+.input-group input:focus, .input-group select:focus { outline: none; border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.1); }
+.input-group input[readonly] { background: #f9fafb; font-weight: 600; color: #1a202c; }
+.swap-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e5e7eb; background: white; font-size: 1.2rem; cursor: pointer; margin-top: 1rem; transition: all 0.2s; flex-shrink: 0; }
+.swap-btn:hover { border-color: #ea580c; background: #fff7ed; }
+.result-display { background: #fff7ed; border: 2px solid #fed7aa; border-radius: 12px; padding: 1.25rem; text-align: center; margin-bottom: 1rem; }
+.result-display .value { font-size: 1.8rem; font-weight: 700; color: #ea580c; }
+.result-display .label { font-size: 0.85rem; color: #9a3412; margin-top: 0.25rem; }
+.copy-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+.copy-btn:hover { background: #f9fafb; }
+
+/* 날짜 계산 */
+.date-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f3f4f6; }
+.date-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.date-section h3 { font-size: 0.95rem; color: #374151; margin-bottom: 1rem; }
+.date-row { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
+.date-row .input-group { min-width: 140px; }
+.date-result { margin-top: 1rem; padding: 1rem; background: #fff7ed; border-radius: 8px; font-size: 0.95rem; line-height: 1.7; }
+.date-result strong { color: #ea580c; }
+
+/* 파일 크기 */
+.size-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.size-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; text-align: center; cursor: pointer; transition: all 0.15s; }
+.size-card:hover { background: #fff7ed; border-color: #fed7aa; }
+.size-card .unit { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; }
+.size-card .val { font-size: 1.1rem; font-weight: 700; color: #1a202c; margin-top: 0.2rem; }
+
+/* 변환 이력 */
+.history-section { margin-top: 1.5rem; }
+.history-section h3 { font-size: 0.95rem; color: #374151; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; font-size: 0.85rem; }
+.history-item:last-child { border-bottom: none; }
+.history-expr { color: #374151; }
+.history-time { color: #9ca3af; font-size: 0.75rem; }
+.clear-btn { font-size: 0.75rem; color: #9ca3af; cursor: pointer; border: none; background: none; }
+.clear-btn:hover { color: #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>다기능 단위 변환기</h1>
+    <p>환율, 날짜, 파일 크기를 간편하게 변환하세요</p>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab(0)">환율 계산기</button>
+        <button class="tab" onclick="switchTab(1)">날짜 계산기</button>
+        <button class="tab" onclick="switchTab(2)">파일 크기 변환</button>
+    </div>
+
+    <!-- 환율 계산기 -->
+    <div class="card tab-content active" id="tab0">
+        <div class="converter-row">
+            <div class="input-group">
+                <label>원본 통화</label>
+                <select id="fromCurrency" onchange="convertCurrency()">
+                    <option value="KRW">KRW - 한국 원</option>
+                    <option value="USD" selected>USD - 미국 달러</option>
+                    <option value="EUR">EUR - 유로</option>
+                    <option value="JPY">JPY - 일본 엔</option>
+                    <option value="CNY">CNY - 중국 위안</option>
+                    <option value="GBP">GBP - 영국 파운드</option>
+                </select>
+            </div>
+            <button class="swap-btn" onclick="swapCurrency()" title="교환">&#8646;</button>
+            <div class="input-group">
+                <label>변환 통화</label>
+                <select id="toCurrency" onchange="convertCurrency()">
+                    <option value="KRW" selected>KRW - 한국 원</option>
+                    <option value="USD">USD - 미국 달러</option>
+                    <option value="EUR">EUR - 유로</option>
+                    <option value="JPY">JPY - 일본 엔</option>
+                    <option value="CNY">CNY - 중국 위안</option>
+                    <option value="GBP">GBP - 영국 파운드</option>
+                </select>
+            </div>
+        </div>
+        <div class="converter-row">
+            <div class="input-group" style="flex:1">
+                <label>금액</label>
+                <input type="text" id="currencyAmount" value="1,000" oninput="convertCurrency()" placeholder="금액을 입력하세요">
+            </div>
+        </div>
+        <div class="result-display">
+            <div class="value" id="currencyResult">-</div>
+            <div class="label" id="currencyLabel">변환 결과</div>
+        </div>
+        <div style="text-align:center">
+            <button class="copy-btn" onclick="copyResult('currencyResult')">결과 복사</button>
+        </div>
+        <p style="font-size:0.75rem; color:#9ca3af; text-align:center; margin-top:1rem;">* 참고용 고정 환율입니다. 실제 환율과 다를 수 있습니다.</p>
+    </div>
+
+    <!-- 날짜 계산기 -->
+    <div class="card tab-content" id="tab1">
+        <div class="date-section">
+            <h3>두 날짜 사이 기간</h3>
+            <div class="date-row">
+                <div class="input-group">
+                    <label>시작일</label>
+                    <input type="date" id="dateFrom" onchange="calcDateDiff()">
+                </div>
+                <div class="input-group">
+                    <label>종료일</label>
+                    <input type="date" id="dateTo" onchange="calcDateDiff()">
+                </div>
+            </div>
+            <div class="date-result" id="dateDiffResult" style="display:none"></div>
+        </div>
+        <div class="date-section">
+            <h3>날짜에 일수 더하기/빼기</h3>
+            <div class="date-row">
+                <div class="input-group">
+                    <label>기준일</label>
+                    <input type="date" id="dateBase" onchange="calcDateAdd()">
+                </div>
+                <div class="input-group" style="min-width:100px; flex:0.5;">
+                    <label>일수</label>
+                    <input type="number" id="dateAddDays" value="30" onchange="calcDateAdd()" oninput="calcDateAdd()">
+                </div>
+                <div class="input-group" style="min-width:100px; flex:0.5;">
+                    <label>연산</label>
+                    <select id="dateAddOp" onchange="calcDateAdd()">
+                        <option value="add">더하기 (+)</option>
+                        <option value="sub">빼기 (-)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="date-result" id="dateAddResult" style="display:none"></div>
+        </div>
+    </div>
+
+    <!-- 파일 크기 변환 -->
+    <div class="card tab-content" id="tab2">
+        <div class="converter-row">
+            <div class="input-group" style="flex:2">
+                <label>크기 입력</label>
+                <input type="text" id="fileSize" value="1,024" oninput="convertFileSize()" placeholder="숫자를 입력하세요">
+            </div>
+            <div class="input-group" style="flex:1">
+                <label>단위</label>
+                <select id="fileSizeUnit" onchange="convertFileSize()">
+                    <option value="B">Bytes</option>
+                    <option value="KB">KB</option>
+                    <option value="MB" selected>MB</option>
+                    <option value="GB">GB</option>
+                    <option value="TB">TB</option>
+                    <option value="PB">PB</option>
+                </select>
+            </div>
+        </div>
+        <div class="size-grid" id="sizeGrid"></div>
+    </div>
+
+    <!-- 변환 이력 -->
+    <div class="card card-standalone">
+        <div class="history-section">
+            <h3>변환 이력 <button class="clear-btn" onclick="clearHistory()">전체 삭제</button></h3>
+            <div id="historyList"><div style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.85rem;">변환 이력이 없습니다</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 탭 전환
+function switchTab(idx) {
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === idx));
+}
+
+// 숫자 포맷
+function formatNum(n, decimals = 2) {
+    if (Math.abs(n) < 0.01 && n !== 0) return n.toExponential(2);
+    const parts = n.toFixed(decimals).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (parts[1] && parseInt(parts[1]) === 0) return parts[0];
+    // 소수 부분 끝의 0 제거
+    if (parts[1]) parts[1] = parts[1].replace(/0+$/, '');
+    return parts[1] ? parts.join('.') : parts[0];
+}
+
+function parseNum(s) {
+    return parseFloat(String(s).replace(/,/g, '')) || 0;
+}
+
+// 환율 (고정 환율, KRW 기준)
+const rates = { KRW: 1, USD: 1380, EUR: 1490, JPY: 9.2, CNY: 190, GBP: 1720 };
+
+function convertCurrency() {
+    const from = document.getElementById('fromCurrency').value;
+    const to = document.getElementById('toCurrency').value;
+    const amount = parseNum(document.getElementById('currencyAmount').value);
+    if (!amount) { document.getElementById('currencyResult').textContent = '-'; return; }
+
+    const inKRW = amount * rates[from];
+    const result = inKRW / rates[to];
+
+    document.getElementById('currencyResult').textContent = formatNum(result);
+    document.getElementById('currencyLabel').textContent = `${formatNum(amount)} ${from} = ${formatNum(result)} ${to}`;
+
+    addHistory(`${formatNum(amount)} ${from} = ${formatNum(result)} ${to}`);
+}
+
+function swapCurrency() {
+    const from = document.getElementById('fromCurrency');
+    const to = document.getElementById('toCurrency');
+    [from.value, to.value] = [to.value, from.value];
+    convertCurrency();
+}
+
+// 날짜 계산
+const todayStr = new Date().toISOString().split('T')[0];
+document.getElementById('dateFrom').value = todayStr;
+document.getElementById('dateTo').value = todayStr;
+document.getElementById('dateBase').value = todayStr;
+
+function calcDateDiff() {
+    const from = new Date(document.getElementById('dateFrom').value);
+    const to = new Date(document.getElementById('dateTo').value);
+    if (isNaN(from) || isNaN(to)) return;
+
+    const diffMs = to - from;
+    const diffDays = Math.round(diffMs / 86400000);
+    const absDays = Math.abs(diffDays);
+    const years = Math.floor(absDays / 365);
+    const months = Math.floor((absDays % 365) / 30);
+    const days = absDays % 30;
+    const weeks = Math.floor(absDays / 7);
+
+    const el = document.getElementById('dateDiffResult');
+    el.style.display = 'block';
+    el.innerHTML = `
+        총 <strong>${absDays.toLocaleString()}일</strong> (${diffDays >= 0 ? '이후' : '이전'})<br>
+        약 <strong>${years}년 ${months}개월 ${days}일</strong><br>
+        약 <strong>${weeks.toLocaleString()}주</strong> | 약 <strong>${Math.abs(Math.round(diffMs / 3600000)).toLocaleString()}시간</strong>
+    `;
+    addHistory(`${document.getElementById('dateFrom').value} ~ ${document.getElementById('dateTo').value} = ${absDays}일`);
+}
+
+function calcDateAdd() {
+    const base = new Date(document.getElementById('dateBase').value);
+    const days = parseInt(document.getElementById('dateAddDays').value) || 0;
+    const op = document.getElementById('dateAddOp').value;
+    if (isNaN(base)) return;
+
+    const result = new Date(base);
+    result.setDate(result.getDate() + (op === 'add' ? days : -days));
+
+    const dow = ['일', '월', '화', '수', '목', '금', '토'][result.getDay()];
+    const resultStr = result.toISOString().split('T')[0];
+
+    const el = document.getElementById('dateAddResult');
+    el.style.display = 'block';
+    el.innerHTML = `결과: <strong>${resultStr} (${dow}요일)</strong>`;
+    addHistory(`${document.getElementById('dateBase').value} ${op === 'add' ? '+' : '-'} ${days}일 = ${resultStr}`);
+}
+
+// 파일 크기 변환
+const sizeUnits = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+const sizeMultipliers = { B: 1, KB: 1024, MB: 1024**2, GB: 1024**3, TB: 1024**4, PB: 1024**5 };
+
+function convertFileSize() {
+    const value = parseNum(document.getElementById('fileSize').value);
+    const unit = document.getElementById('fileSizeUnit').value;
+    if (!value) { document.getElementById('sizeGrid').innerHTML = ''; return; }
+
+    const bytes = value * sizeMultipliers[unit];
+
+    document.getElementById('sizeGrid').innerHTML = sizeUnits.map(u => {
+        const converted = bytes / sizeMultipliers[u];
+        return `
+            <div class="size-card" onclick="copySizeValue('${formatNum(converted)} ${u}')">
+                <div class="unit">${u}</div>
+                <div class="val">${formatNum(converted)}</div>
+            </div>
+        `;
+    }).join('');
+
+    addHistory(`${formatNum(value)} ${unit} 변환`);
+}
+
+function copySizeValue(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // brief visual feedback would go here
+    });
+}
+
+// 이력 관리
+let historyItems = JSON.parse(localStorage.getItem('converterHistory') || '[]');
+
+function addHistory(text) {
+    // 중복 방지 (같은 내용 연속)
+    if (historyItems.length > 0 && historyItems[0].text === text) return;
+    historyItems.unshift({ text, time: new Date().toLocaleTimeString('ko-KR') });
+    if (historyItems.length > 15) historyItems.pop();
+    localStorage.setItem('converterHistory', JSON.stringify(historyItems));
+    renderHistory();
+}
+
+function renderHistory() {
+    const el = document.getElementById('historyList');
+    if (historyItems.length === 0) {
+        el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.85rem;">변환 이력이 없습니다</div>';
+        return;
+    }
+    el.innerHTML = historyItems.map(h => `
+        <div class="history-item">
+            <span class="history-expr">${h.text}</span>
+            <span class="history-time">${h.time}</span>
+        </div>
+    `).join('');
+}
+
+function clearHistory() {
+    historyItems = [];
+    localStorage.removeItem('converterHistory');
+    renderHistory();
+}
+
+function copyResult(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text);
+}
+
+// 초기 렌더링
+renderHistory();
+convertCurrency();
+convertFileSize();
+</script>
+</body>
+</html>

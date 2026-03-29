@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터 보고서 변환기</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 2rem; text-align: center; }
+.header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.header p { opacity: 0.85; font-size: 0.95rem; }
+.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+/* 입력 섹션 */
+.input-section { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; margin-bottom: 1.5rem; }
+@media (max-width: 900px) { .input-section { grid-template-columns: 1fr; } }
+.card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #374151; }
+textarea { width: 100%; height: 200px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem; font-family: 'Consolas', monospace; font-size: 0.85rem; resize: vertical; line-height: 1.5; }
+textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+label { display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.4rem; }
+select { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; }
+select:focus { outline: none; border-color: #3b82f6; }
+.form-group { margin-bottom: 1rem; }
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #2563eb; color: white; width: 100%; justify-content: center; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-outline { background: white; border: 1px solid #d1d5db; color: #374151; }
+.btn-outline:hover { background: #f9fafb; }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+.actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+
+/* 보고서 */
+.report { display: none; margin-top: 1.5rem; }
+.report.show { display: block; }
+.report-header { text-align: center; padding: 2rem; border-bottom: 3px solid #1e40af; margin-bottom: 1.5rem; }
+.report-header h2 { font-size: 1.6rem; color: #1e40af; }
+.report-header .report-meta { font-size: 0.85rem; color: #6b7280; margin-top: 0.5rem; }
+
+/* 요약 카드 */
+.summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.summary-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; text-align: center; }
+.summary-card .sc-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+.summary-card .sc-value { font-size: 1.6rem; font-weight: 700; color: #1e40af; margin: 0.25rem 0; }
+.summary-card .sc-sub { font-size: 0.75rem; color: #94a3b8; }
+
+/* 표 */
+.report-table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.report-table th { background: #1e40af; color: white; padding: 0.6rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.8rem; white-space: nowrap; }
+.report-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; }
+.report-table tr:nth-child(even) { background: #f9fafb; }
+.report-table tr:hover { background: #eff6ff; }
+.val-high { color: #059669; font-weight: 600; }
+.val-low { color: #dc2626; font-weight: 600; }
+.val-mid { color: #374151; }
+
+/* 차트 */
+.chart-section { margin-bottom: 1.5rem; }
+.chart-section h3 { font-size: 1rem; color: #374151; margin-bottom: 1rem; }
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 700px) { .chart-grid { grid-template-columns: 1fr; } }
+.chart-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; }
+
+/* 분석 텍스트 */
+.analysis { background: #f0f9ff; border-left: 4px solid #2563eb; padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; }
+.analysis h3 { font-size: 0.95rem; color: #1e40af; margin-bottom: 0.5rem; }
+.analysis p, .analysis li { font-size: 0.9rem; line-height: 1.7; color: #374151; }
+.analysis ul { padding-left: 1.25rem; }
+
+/* 인쇄 */
+@media print {
+    .header, .input-section, .no-print { display: none !important; }
+    body { background: white; }
+    .container { max-width: 100%; padding: 0; }
+    .card { box-shadow: none; border: none; padding: 0; }
+    .report { display: block !important; }
+    .report-header { border-bottom-color: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .report-table th { background: #1e40af !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .summary-card, .chart-box, .analysis { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>데이터 보고서 변환기</h1>
+    <p>CSV 데이터를 전문적인 보고서로 자동 변환합니다</p>
+</div>
+
+<div class="container">
+    <div class="input-section no-print">
+        <div class="card">
+            <h2>CSV 데이터 입력</h2>
+            <textarea id="csvInput">부서,목표,실적,달성률,전년대비
+경영기획팀,120,115,95.8,+5.2
+마케팅팀,95,102,107.4,+12.1
+영업1팀,200,218,109.0,+8.7
+영업2팀,180,165,91.7,-3.4
+개발팀,85,88,103.5,+7.8
+인사팀,60,57,95.0,+2.1
+재무팀,70,73,104.3,+6.5
+고객지원팀,110,98,89.1,-1.8</textarea>
+            <div class="actions">
+                <button class="btn btn-sm btn-outline" onclick="loadSample('status')">현황 보고서</button>
+                <button class="btn btn-sm btn-outline" onclick="loadSample('performance')">실적 보고서</button>
+                <button class="btn btn-sm btn-outline" onclick="loadSample('compare')">비교분석</button>
+            </div>
+        </div>
+        <div class="card">
+            <h2>보고서 설정</h2>
+            <div class="form-group">
+                <label>보고서 템플릿</label>
+                <select id="templateType">
+                    <option value="status">현황 보고서</option>
+                    <option value="performance">실적 보고서</option>
+                    <option value="compare">비교분석 보고서</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>보고서 제목</label>
+                <input type="text" id="reportTitle" value="부서별 실적 현황 보고서" style="width:100%; padding:0.5rem 0.75rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.9rem;">
+            </div>
+            <div class="form-group">
+                <label>작성 기준일</label>
+                <input type="date" id="reportDate" style="width:100%; padding:0.5rem 0.75rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.9rem;">
+            </div>
+            <button class="btn btn-primary" onclick="generateReport()" style="margin-top:0.5rem;">보고서 생성</button>
+            <div class="actions" style="margin-top:0.5rem;">
+                <button class="btn btn-sm btn-outline" onclick="window.print()" style="flex:1;">인쇄 / PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="report card" id="reportArea">
+        <!-- 보고서 내용이 여기에 삽입됩니다 -->
+    </div>
+</div>
+
+<script>
+// 오늘 날짜 기본값
+document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+
+const sampleData = {
+    status: `부서,목표,실적,달성률,전년대비
+경영기획팀,120,115,95.8,+5.2
+마케팅팀,95,102,107.4,+12.1
+영업1팀,200,218,109.0,+8.7
+영업2팀,180,165,91.7,-3.4
+개발팀,85,88,103.5,+7.8
+인사팀,60,57,95.0,+2.1
+재무팀,70,73,104.3,+6.5
+고객지원팀,110,98,89.1,-1.8`,
+    performance: `월,매출,비용,이익,이익률
+1월,4520,3200,1320,29.2
+2월,4180,3050,1130,27.0
+3월,5230,3480,1750,33.5
+4월,4890,3310,1580,32.3
+5월,5670,3720,1950,34.4
+6월,5120,3550,1570,30.7
+7월,6340,4100,2240,35.3
+8월,6780,4280,2500,36.9
+9월,5980,3900,2080,34.8
+10월,6450,4050,2400,37.2
+11월,7120,4520,2600,36.5
+12월,7850,4800,3050,38.9`,
+    compare: `항목,2022년,2023년,2024년,증감률
+총매출,58200,64500,71200,+10.4
+영업이익,12400,14200,16800,+18.3
+순이익,8200,9800,12100,+23.5
+고객수,24500,28900,33200,+14.9
+만족도,82.1,85.4,88.7,+3.9
+직원수,342,378,412,+9.0`
+};
+
+function loadSample(type) {
+    document.getElementById('csvInput').value = sampleData[type];
+    document.getElementById('templateType').value = type;
+    const titles = { status: '부서별 실적 현황 보고서', performance: '월별 실적 분석 보고서', compare: '연도별 비교분석 보고서' };
+    document.getElementById('reportTitle').value = titles[type];
+}
+
+function parseCSV(text) {
+    const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
+    const headers = lines[0].split(',').map(h => h.trim());
+    const rows = lines.slice(1).map(line => {
+        const vals = line.split(',').map(v => v.trim());
+        const obj = {};
+        headers.forEach((h, i) => {
+            const num = parseFloat(vals[i]);
+            obj[h] = isNaN(num) || vals[i].startsWith('+') ? vals[i] : num;
+        });
+        return obj;
+    });
+    return { headers, rows };
+}
+
+function formatCell(val, header) {
+    if (typeof val === 'string' && val.startsWith('+')) return `<span class="val-high">${val}</span>`;
+    if (typeof val === 'string' && val.startsWith('-')) return `<span class="val-low">${val}</span>`;
+    if (typeof val !== 'number') return val;
+
+    // 달성률/이익률 등 비율 컬럼
+    if (/률|율/.test(header)) {
+        if (val >= 100) return `<span class="val-high">${val.toFixed(1)}%</span>`;
+        if (val >= 90) return `<span class="val-mid">${val.toFixed(1)}%</span>`;
+        return `<span class="val-low">${val.toFixed(1)}%</span>`;
+    }
+    // 일반 수치 - 90 이상 초록, 80 미만 빨강 (퍼센트류가 아닌 경우는 천단위 쉼표만)
+    if (val >= 1000) return val.toLocaleString('ko-KR');
+    return val;
+}
+
+function colorByScore(val) {
+    if (typeof val !== 'number') return 'val-mid';
+    if (val >= 90) return 'val-high';
+    if (val < 80) return 'val-low';
+    return 'val-mid';
+}
+
+let charts = [];
+
+function generateReport() {
+    const csvText = document.getElementById('csvInput').value.trim();
+    if (!csvText) { alert('CSV 데이터를 입력해주세요.'); return; }
+
+    const { headers, rows } = parseCSV(csvText);
+    const title = document.getElementById('reportTitle').value;
+    const date = document.getElementById('reportDate').value;
+    const template = document.getElementById('templateType').value;
+
+    // 차트 정리
+    charts.forEach(c => c.destroy());
+    charts = [];
+
+    // 숫자 컬럼 찾기
+    const numCols = headers.filter((h, i) => i > 0 && rows.some(r => typeof r[h] === 'number'));
+
+    // 요약 통계 계산
+    const summaryStats = numCols.map(col => {
+        const vals = rows.map(r => typeof r[col] === 'number' ? r[col] : parseFloat(String(r[col]).replace(/[+%,]/g, ''))).filter(v => !isNaN(v));
+        const sum = vals.reduce((a, b) => a + b, 0);
+        const avg = sum / vals.length;
+        const max = Math.max(...vals);
+        const min = Math.min(...vals);
+        return { col, sum, avg, max, min, count: vals.length };
+    });
+
+    // 분석 텍스트 생성
+    const analysis = generateAnalysis(headers, rows, numCols, summaryStats, template);
+
+    // HTML 생성
+    let html = `
+        <div class="report-header">
+            <h2>${title}</h2>
+            <div class="report-meta">작성일: ${date} | 데이터 건수: ${rows.length}건</div>
+        </div>
+
+        <div class="summary-row">
+            <div class="summary-card">
+                <div class="sc-label">데이터 건수</div>
+                <div class="sc-value">${rows.length}</div>
+                <div class="sc-sub">건</div>
+            </div>
+            ${summaryStats.slice(0, 3).map(s => `
+                <div class="summary-card">
+                    <div class="sc-label">${s.col} 평균</div>
+                    <div class="sc-value">${s.avg >= 1000 ? Math.round(s.avg).toLocaleString() : s.avg.toFixed(1)}</div>
+                    <div class="sc-sub">최대 ${s.max >= 1000 ? s.max.toLocaleString() : s.max} / 최소 ${s.min >= 1000 ? s.min.toLocaleString() : s.min}</div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="analysis">
+            <h3>분석 요약</h3>
+            ${analysis}
+        </div>
+
+        <div class="report-table-wrap">
+            <table class="report-table">
+                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                <tbody>
+                    ${rows.map(row => `<tr>${headers.map(h => `<td>${formatCell(row[h], h)}</td>`).join('')}</tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-section">
+            <h3>시각화</h3>
+            <div class="chart-grid">
+                <div class="chart-box"><canvas id="reportChart1"></canvas></div>
+                <div class="chart-box"><canvas id="reportChart2"></canvas></div>
+            </div>
+        </div>
+    `;
+
+    const reportEl = document.getElementById('reportArea');
+    reportEl.innerHTML = html;
+    reportEl.classList.add('show');
+
+    // 차트 렌더링
+    renderReportCharts(headers, rows, numCols);
+    reportEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function generateAnalysis(headers, rows, numCols, stats, template) {
+    const labelCol = headers[0];
+    let text = '<ul>';
+
+    if (numCols.length > 0) {
+        const mainStat = stats[0];
+        text += `<li><strong>${mainStat.col}</strong> 평균은 <strong>${mainStat.avg >= 1000 ? Math.round(mainStat.avg).toLocaleString() : mainStat.avg.toFixed(1)}</strong>이며, `;
+
+        // 최고/최저 찾기
+        const mainCol = mainStat.col;
+        const maxRow = rows.reduce((a, b) => {
+            const va = typeof a[mainCol] === 'number' ? a[mainCol] : 0;
+            const vb = typeof b[mainCol] === 'number' ? b[mainCol] : 0;
+            return va > vb ? a : b;
+        });
+        const minRow = rows.reduce((a, b) => {
+            const va = typeof a[mainCol] === 'number' ? a[mainCol] : 0;
+            const vb = typeof b[mainCol] === 'number' ? b[mainCol] : 0;
+            return va < vb ? a : b;
+        });
+        text += `최고 항목은 <strong>${maxRow[labelCol]}</strong>(${typeof maxRow[mainCol] === 'number' ? maxRow[mainCol].toLocaleString() : maxRow[mainCol]}), 최저 항목은 <strong>${minRow[labelCol]}</strong>(${typeof minRow[mainCol] === 'number' ? minRow[mainCol].toLocaleString() : minRow[mainCol]})입니다.</li>`;
+    }
+
+    // 달성률 관련 분석
+    const rateCol = headers.find(h => /률|율/.test(h));
+    if (rateCol) {
+        const aboveTarget = rows.filter(r => typeof r[rateCol] === 'number' && r[rateCol] >= 100);
+        const belowTarget = rows.filter(r => typeof r[rateCol] === 'number' && r[rateCol] < 90);
+        text += `<li>${rateCol} 100% 이상 달성: <strong>${aboveTarget.length}건</strong> (${(aboveTarget.length/rows.length*100).toFixed(0)}%)`;
+        if (belowTarget.length > 0) {
+            text += `, 90% 미만: <strong>${belowTarget.length}건</strong> (${belowTarget.map(r => r[headers[0]]).join(', ')})`;
+        }
+        text += '</li>';
+    }
+
+    // 증감 분석
+    const changeCol = headers.find(h => /증감|대비|변화/.test(h));
+    if (changeCol) {
+        const positive = rows.filter(r => {
+            const v = String(r[changeCol]);
+            return v.startsWith('+');
+        });
+        text += `<li>전년 대비 개선: <strong>${positive.length}건</strong> / 전체 ${rows.length}건</li>`;
+    }
+
+    text += '</ul>';
+    return text;
+}
+
+function renderReportCharts(headers, rows, numCols) {
+    const labels = rows.map(r => r[headers[0]]);
+    const colors = ['#2563eb', '#059669', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+
+    // 차트 1: 막대 차트
+    if (numCols.length > 0) {
+        const datasets = numCols.slice(0, 3).map((col, i) => ({
+            label: col,
+            data: rows.map(r => typeof r[col] === 'number' ? r[col] : parseFloat(String(r[col]).replace(/[+%,]/g, '')) || 0),
+            backgroundColor: colors[i] + 'cc',
+            borderColor: colors[i],
+            borderWidth: 1,
+            borderRadius: 4
+        }));
+
+        const c1 = new Chart(document.getElementById('reportChart1'), {
+            type: 'bar',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}` } } },
+                scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() }, grid: { color: '#f0f0f0' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+            }
+        });
+        charts.push(c1);
+    }
+
+    // 차트 2: 선 또는 도넛
+    if (numCols.length >= 2) {
+        const mainCol = numCols[0];
+        const vals = rows.map(r => typeof r[mainCol] === 'number' ? r[mainCol] : 0);
+        const type2 = rows.length <= 10 ? 'doughnut' : 'line';
+
+        if (type2 === 'doughnut') {
+            const c2 = new Chart(document.getElementById('reportChart2'), {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{ data: vals, backgroundColor: labels.map((_, i) => colors[i % colors.length]), borderWidth: 2, borderColor: '#fff' }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '50%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        title: { display: true, text: `${mainCol} 비중`, font: { size: 13 } } }
+                }
+            });
+            charts.push(c2);
+        } else {
+            const c2 = new Chart(document.getElementById('reportChart2'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: numCols.slice(0, 2).map((col, i) => ({
+                        label: col,
+                        data: rows.map(r => typeof r[col] === 'number' ? r[col] : 0),
+                        borderColor: colors[i],
+                        backgroundColor: colors[i] + '20',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() }, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+                }
+            });
+            charts.push(c2);
+        }
+    }
+}
+</script>
+</body>
+</html>

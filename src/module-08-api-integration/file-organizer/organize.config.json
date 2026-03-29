@@ -1,0 +1,19 @@
+{
+  "categories": {
+    "이미지": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico"],
+    "문서": [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".hwp", ".rtf"],
+    "동영상": [".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv", ".webm"],
+    "음악": [".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a"],
+    "압축파일": [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"],
+    "코드": [".js", ".py", ".java", ".html", ".css", ".json", ".xml", ".md", ".ts", ".jsx", ".tsx"],
+    "데이터": [".csv", ".tsv", ".sql", ".db", ".sqlite"],
+    "폰트": [".ttf", ".otf", ".woff", ".woff2"],
+    "설치파일": [".dmg", ".exe", ".msi", ".pkg", ".deb", ".rpm"]
+  },
+  "sizeThresholds": {
+    "small": 1048576,
+    "medium": 104857600
+  },
+  "ignoredFiles": [".DS_Store", "Thumbs.db", ".gitkeep", "desktop.ini"],
+  "logFile": "organize-log.json"
+}

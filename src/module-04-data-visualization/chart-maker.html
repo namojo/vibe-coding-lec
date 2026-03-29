@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSV 데이터 차트 시각화 도구</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; padding: 2rem; text-align: center; }
+.header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.header p { opacity: 0.85; font-size: 0.95rem; }
+.container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #374151; display: flex; align-items: center; gap: 0.5rem; }
+textarea { width: 100%; height: 200px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.75rem; font-family: 'Consolas', monospace; font-size: 0.85rem; resize: vertical; line-height: 1.5; }
+textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+label { display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.4rem; }
+select, input[type="text"] { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; background: white; }
+select:focus, input:focus { outline: none; border-color: #2563eb; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.form-group { margin-bottom: 1rem; }
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+.btn-secondary:hover { background: #e5e7eb; }
+.btn-success { background: #059669; color: white; }
+.btn-success:hover { background: #047857; }
+.actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.chart-container { position: relative; width: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center; }
+.chart-container canvas { max-width: 100%; }
+.placeholder { color: #9ca3af; text-align: center; padding: 3rem; }
+.theme-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.theme-pill { padding: 0.35rem 0.75rem; border-radius: 20px; border: 2px solid #d1d5db; background: white; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+.theme-pill.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; font-weight: 600; }
+.theme-pill:hover { border-color: #93c5fd; }
+.preview-colors { display: flex; gap: 2px; margin-left: 0.3rem; }
+.preview-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 0.75rem 1rem; border-radius: 8px; margin-top: 0.75rem; font-size: 0.85rem; display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CSV 데이터 차트 시각화 도구</h1>
+    <p>CSV 데이터를 붙여넣고 다양한 차트로 시각화하세요</p>
+</div>
+
+<div class="container">
+    <div class="grid">
+        <div class="card">
+            <h2>데이터 입력</h2>
+            <div class="form-group">
+                <label for="csvInput">CSV 데이터 (첫 줄: 헤더)</label>
+                <textarea id="csvInput">월,방문자수,가입자수
+1월,12500,320
+2월,14200,410
+3월,15800,380
+4월,18900,520
+5월,22100,610
+6월,19700,450
+7월,24500,720
+8월,26300,680
+9월,21800,550
+10월,23400,630
+11월,28100,810
+12월,31200,950</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="chartTitle">차트 제목</label>
+                <input type="text" id="chartTitle" value="월별 방문자 및 가입자 현황" placeholder="차트 제목을 입력하세요">
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="chartType">차트 유형</label>
+                    <select id="chartType">
+                        <option value="bar">막대 차트</option>
+                        <option value="line">선 차트</option>
+                        <option value="pie">파이 차트</option>
+                    </select>
+                </div>
+                <div>
+                    <label>색상 테마</label>
+                    <div class="theme-pills" id="themePills">
+                        <button class="theme-pill active" data-theme="default">
+                            기본
+                            <span class="preview-colors">
+                                <span class="preview-dot" style="background:#3b82f6"></span>
+                                <span class="preview-dot" style="background:#ef4444"></span>
+                                <span class="preview-dot" style="background:#10b981"></span>
+                            </span>
+                        </button>
+                        <button class="theme-pill" data-theme="pastel">
+                            파스텔
+                            <span class="preview-colors">
+                                <span class="preview-dot" style="background:#93c5fd"></span>
+                                <span class="preview-dot" style="background:#fca5a5"></span>
+                                <span class="preview-dot" style="background:#86efac"></span>
+                            </span>
+                        </button>
+                        <button class="theme-pill" data-theme="vivid">
+                            비비드
+                            <span class="preview-colors">
+                                <span class="preview-dot" style="background:#ff006e"></span>
+                                <span class="preview-dot" style="background:#ffbe0b"></span>
+                                <span class="preview-dot" style="background:#00f5d4"></span>
+                            </span>
+                        </button>
+                        <button class="theme-pill" data-theme="mono">
+                            모노톤
+                            <span class="preview-colors">
+                                <span class="preview-dot" style="background:#1e293b"></span>
+                                <span class="preview-dot" style="background:#64748b"></span>
+                                <span class="preview-dot" style="background:#94a3b8"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateChart()">차트 생성</button>
+                <button class="btn btn-secondary" onclick="loadSample()">예제 데이터</button>
+            </div>
+            <div class="error" id="errorMsg"></div>
+        </div>
+
+        <div class="card">
+            <h2>차트 미리보기</h2>
+            <div class="chart-container" id="chartArea">
+                <div class="placeholder" id="placeholder">CSV 데이터를 입력하고<br>차트 생성 버튼을 클릭하세요</div>
+                <canvas id="myChart" style="display:none"></canvas>
+            </div>
+            <div class="actions" style="margin-top:1rem; justify-content: flex-end;">
+                <button class="btn btn-success" onclick="saveAsPNG()" id="saveBtn" style="display:none">PNG 저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const THEMES = {
+    default: ['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'],
+    pastel: ['#93c5fd','#fca5a5','#86efac','#fde68a','#c4b5fd','#f9a8d4','#67e8f9','#bef264','#fdba74','#a5b4fc'],
+    vivid: ['#ff006e','#ffbe0b','#00f5d4','#8338ec','#fb5607','#3a86ff','#ff595e','#1982c4','#6a4c93','#ffca3a'],
+    mono: ['#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#f1f5f9','#0f172a','#374151']
+};
+
+let chart = null;
+let currentTheme = 'default';
+
+document.querySelectorAll('.theme-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+        document.querySelectorAll('.theme-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentTheme = pill.dataset.theme;
+        if (chart) generateChart();
+    });
+});
+
+function parseCSV(text) {
+    const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
+    if (lines.length < 2) throw new Error('최소 2줄(헤더+데이터) 이상 필요합니다.');
+    const headers = lines[0].split(',').map(h => h.trim());
+    const data = lines.slice(1).map(line => {
+        const vals = line.split(',').map(v => v.trim());
+        return vals;
+    });
+    return { headers, data };
+}
+
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function generateChart() {
+    const csv = document.getElementById('csvInput').value;
+    const chartType = document.getElementById('chartType').value;
+    const title = document.getElementById('chartTitle').value;
+    const colors = THEMES[currentTheme];
+
+    try {
+        const { headers, data } = parseCSV(csv);
+        const labels = data.map(row => row[0]);
+        const datasets = [];
+
+        for (let i = 1; i < headers.length; i++) {
+            const values = data.map(row => {
+                const v = parseFloat(row[i]);
+                if (isNaN(v)) throw new Error(`"${row[i]}"은(는) 올바른 숫자가 아닙니다.`);
+                return v;
+            });
+
+            if (chartType === 'pie') {
+                datasets.push({
+                    label: headers[i],
+                    data: values,
+                    backgroundColor: labels.map((_, idx) => colors[idx % colors.length]),
+                    borderColor: '#fff',
+                    borderWidth: 2
+                });
+                break;
+            } else {
+                datasets.push({
+                    label: headers[i],
+                    data: values,
+                    backgroundColor: chartType === 'bar' ? colors[(i - 1) % colors.length] + 'cc' : 'transparent',
+                    borderColor: colors[(i - 1) % colors.length],
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: chartType === 'line' ? 4 : 0,
+                    pointHoverRadius: 6,
+                    fill: chartType === 'line'
+                });
+            }
+        }
+
+        if (chart) chart.destroy();
+        const canvas = document.getElementById('myChart');
+        canvas.style.display = 'block';
+        document.getElementById('placeholder').style.display = 'none';
+        document.getElementById('saveBtn').style.display = 'inline-flex';
+
+        chart = new Chart(canvas, {
+            type: chartType,
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: { display: !!title, text: title, font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
+                    legend: { position: chartType === 'pie' ? 'right' : 'top' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: { size: 13 },
+                        bodyFont: { size: 12 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(ctx) {
+                                let val = ctx.parsed.y ?? ctx.parsed;
+                                if (typeof val === 'number') val = val.toLocaleString('ko-KR');
+                                return ` ${ctx.dataset.label}: ${val}`;
+                            }
+                        }
+                    }
+                },
+                scales: chartType === 'pie' ? {} : {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: v => v.toLocaleString('ko-KR') },
+                        grid: { color: '#f0f0f0' }
+                    },
+                    x: { grid: { display: false } }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
+        });
+
+        document.getElementById('errorMsg').style.display = 'none';
+    } catch (e) {
+        showError(e.message);
+    }
+}
+
+function saveAsPNG() {
+    if (!chart) return;
+    const link = document.createElement('a');
+    link.download = 'chart.png';
+    link.href = document.getElementById('myChart').toDataURL('image/png', 1.0);
+    link.click();
+}
+
+function loadSample() {
+    document.getElementById('csvInput').value = `월,방문자수,가입자수
+1월,12500,320
+2월,14200,410
+3월,15800,380
+4월,18900,520
+5월,22100,610
+6월,19700,450
+7월,24500,720
+8월,26300,680
+9월,21800,550
+10월,23400,630
+11월,28100,810
+12월,31200,950`;
+    document.getElementById('chartTitle').value = '월별 방문자 및 가입자 현황';
+}
+
+// 초기 차트 생성
+window.addEventListener('DOMContentLoaded', generateChart);
+</script>
+</body>
+</html>

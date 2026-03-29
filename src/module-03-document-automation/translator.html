@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다국어 문서 번역 도우미</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    color: #fff;
+    padding: 24px 32px;
+    text-align: center;
+  }
+
+  header h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  header p  { font-size: 0.9rem; color: rgba(255,255,255,.7); }
+
+  .toolbar {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .lang-group {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .lang-btn {
+    padding: 6px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .lang-btn.active {
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+  }
+
+  .lang-btn:hover:not(.active) { background: #f0fdf4; border-color: #059669; }
+
+  .swap-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+
+  .swap-btn:hover { background: #f0fdf4; border-color: #059669; }
+
+  .style-select {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: #fff;
+  }
+
+  /* 메인 레이아웃 */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 16px auto 0;
+    padding: 0 20px 28px;
+  }
+
+  .panel {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #e8eaed;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .panel-header h2 { font-size: 1rem; color: #1e293b; }
+
+  .char-count { font-size: 0.8rem; color: #94a3b8; }
+
+  .panel-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+
+  textarea {
+    width: 100%; flex: 1;
+    min-height: 300px;
+    border: 1px solid #dde0e4;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    resize: vertical;
+    font-family: inherit;
+    color: #333;
+    transition: border-color .2s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5,150,105,.1);
+  }
+
+  .output-area {
+    width: 100%; flex: 1;
+    min-height: 300px;
+    border: 1px solid #dde0e4;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #333;
+    background: #fafbfc;
+    white-space: pre-wrap;
+    overflow-y: auto;
+  }
+
+  .output-placeholder { color: #94a3b8; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: .9; }
+
+  .btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+  }
+  .btn-secondary:hover { background: #e2e8f0; }
+
+  .btn-example {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  .btn-example:hover { background: #fde68a; }
+
+  /* 히스토리 */
+  .history-section {
+    max-width: 1200px;
+    margin: 0 auto 28px;
+    padding: 0 20px;
+  }
+
+  .history-section h3 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 12px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 16px;
+    align-items: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background .2s;
+  }
+
+  .history-item:hover { background: #f0fdf4; }
+
+  .history-item .lang-pair {
+    font-weight: 600;
+    color: #059669;
+    white-space: nowrap;
+  }
+
+  .history-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #64748b;
+  }
+
+  .history-time {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+
+  .empty-history {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.88rem;
+    padding: 20px;
+  }
+
+  /* 토스트 */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b; color: #fff;
+    padding: 12px 28px; border-radius: 10px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    transition: transform .3s ease;
+    z-index: 100;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .toolbar { gap: 8px; }
+    .history-item { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>다국어 문서 번역 도우미</h1>
+  <p>데모용 예제 번역을 제공합니다 (실제 AI 번역 API는 미연결)</p>
+</header>
+
+<!-- 툴바 -->
+<div class="toolbar">
+  <label>원문:</label>
+  <div class="lang-group" id="srcLangs">
+    <button class="lang-btn active" data-lang="ko">한국어</button>
+    <button class="lang-btn" data-lang="en">English</button>
+    <button class="lang-btn" data-lang="ja">日本語</button>
+    <button class="lang-btn" data-lang="zh">中文</button>
+  </div>
+
+  <button class="swap-btn" onclick="swapLangs()" title="언어 교환">&#8646;</button>
+
+  <label>번역:</label>
+  <div class="lang-group" id="tgtLangs">
+    <button class="lang-btn" data-lang="ko">한국어</button>
+    <button class="lang-btn active" data-lang="en">English</button>
+    <button class="lang-btn" data-lang="ja">日本語</button>
+    <button class="lang-btn" data-lang="zh">中文</button>
+  </div>
+
+  <label style="margin-left: 12px">스타일:</label>
+  <select class="style-select" id="style">
+    <option value="formal">공식 문서</option>
+    <option value="casual">일상 대화</option>
+    <option value="technical">기술 문서</option>
+  </select>
+</div>
+
+<!-- 메인 -->
+<div class="main">
+  <div class="panel">
+    <div class="panel-header">
+      <h2 id="srcLabel">원문 (한국어)</h2>
+      <span class="char-count" id="charCount">0자</span>
+    </div>
+    <div class="panel-body">
+      <textarea id="srcText" placeholder="번역할 텍스트를 입력하세요..." oninput="updateCount()"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="translate()">번역하기</button>
+        <button class="btn btn-example" onclick="loadExample()">예제 불러오기</button>
+        <button class="btn btn-secondary" onclick="clearAll()">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2 id="tgtLabel">번역 결과 (English)</h2>
+      <button class="btn btn-secondary" onclick="copyResult()" style="padding:6px 14px; font-size:.82rem">복사</button>
+    </div>
+    <div class="panel-body">
+      <div class="output-area" id="tgtText"><span class="output-placeholder">번역 결과가 여기에 표시됩니다</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 히스토리 -->
+<div class="history-section">
+  <h3>번역 히스토리</h3>
+  <div id="historyList"><div class="empty-history">아직 번역 기록이 없습니다</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LANG_NAMES = { ko: '한국어', en: 'English', ja: '日本語', zh: '中文' };
+
+// 데모 번역 데이터
+const DEMO_TRANSLATIONS = {
+  'ko-en-formal': `The National Information Society Agency (NIA) is leading the digital transformation of the public sector. We are promoting pilot AI adoption projects in three local governments—Sejong City, Busan Metropolitan City, and Jeju Province—and plan to apply domestically developed AI models specialized for public data, which have achieved an accuracy rate of 93%. The pilot program will run for six months, from April to September 2025.`,
+  'ko-en-casual': `NIA is spearheading digital transformation in the public sector. We're rolling out AI pilot projects in three cities—Sejong, Busan, and Jeju—and we'll be using a Korean-made AI model that's been fine-tuned for public data with 93% accuracy. The pilot runs from April to September 2025.`,
+  'ko-en-technical': `NIA (National Information Society Agency) is driving digital transformation initiatives across the public sector. AI adoption pilot programs are being deployed in three municipalities: Sejong Special Autonomous City, Busan Metropolitan City, and Jeju Special Self-Governing Province. The selected model is a domestic AI solution optimized for public data processing, achieving 93% accuracy in benchmark evaluations. The pilot phase spans Q2–Q3 2025 (April–September).`,
+  'ko-ja-formal': `韓国知能情報社会振興院（NIA）は、公共部門のデジタル転換を主導しています。世宗市、釜山広域市、済州道の3つの自治体でAI導入試範事業を推進し、正確度93%を達成した公共データ特化型の国産AIモデルを優先的に適用する予定です。試範事業期間は2025年4月から9月までの6ヶ月間です。`,
+  'ko-zh-formal': `韩国国家信息社会振兴院（NIA）正在引领公共部门的数字化转型。我们正在世宗市、釜山广域市和济州道三个地方政府推进AI引入试点项目，并计划优先应用准确率达93%的专为公共数据定制的国产AI模型。试点项目将于2025年4月至9月运行，为期6个月。`,
+  'en-ko-formal': `한국지능정보사회진흥원(NIA)은 공공부문의 디지털 전환을 선도하고 있습니다. 세종시, 부산광역시, 제주도 3개 지자체에서 AI 도입 시범사업을 추진하며, 정확도 93%를 달성한 공공 데이터 특화 국산 AI 모델을 우선 적용할 예정입니다. 시범사업 기간은 2025년 4월부터 9월까지 6개월입니다.`,
+};
+
+const EXAMPLE_TEXT = `한국지능정보사회진흥원(NIA)은 공공부문의 디지털 전환을 선도하고 있습니다. 세종시, 부산광역시, 제주도 3개 지자체에서 AI 도입 시범사업을 추진하며, 정확도 93%를 달성한 공공 데이터 특화 국산 AI 모델을 우선 적용할 예정입니다. 시범사업 기간은 2025년 4월부터 9월까지 6개월입니다.`;
+
+let history = [];
+
+// 언어 버튼 이벤트
+document.querySelectorAll('#srcLangs .lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#srcLangs .lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('srcLabel').textContent = `원문 (${LANG_NAMES[btn.dataset.lang]})`;
+  });
+});
+
+document.querySelectorAll('#tgtLangs .lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tgtLangs .lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tgtLabel').textContent = `번역 결과 (${LANG_NAMES[btn.dataset.lang]})`;
+  });
+});
+
+function getSelectedLang(groupId) {
+  return document.querySelector(`#${groupId} .lang-btn.active`).dataset.lang;
+}
+
+function swapLangs() {
+  const src = getSelectedLang('srcLangs');
+  const tgt = getSelectedLang('tgtLangs');
+
+  document.querySelectorAll('#srcLangs .lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === tgt);
+  });
+  document.querySelectorAll('#tgtLangs .lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === src);
+  });
+
+  document.getElementById('srcLabel').textContent = `원문 (${LANG_NAMES[tgt]})`;
+  document.getElementById('tgtLabel').textContent = `번역 결과 (${LANG_NAMES[src]})`;
+
+  // swap text
+  const srcArea = document.getElementById('srcText');
+  const tgtArea = document.getElementById('tgtText');
+  const tgtContent = tgtArea.querySelector('.output-placeholder') ? '' : tgtArea.textContent;
+  if (tgtContent) {
+    srcArea.value = tgtContent;
+    tgtArea.innerHTML = '<span class="output-placeholder">번역 결과가 여기에 표시됩니다</span>';
+    updateCount();
+  }
+}
+
+function updateCount() {
+  const len = document.getElementById('srcText').value.length;
+  document.getElementById('charCount').textContent = `${len.toLocaleString()}자`;
+}
+
+function loadExample() {
+  document.getElementById('srcText').value = EXAMPLE_TEXT;
+  // reset to ko -> en
+  document.querySelectorAll('#srcLangs .lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === 'ko'));
+  document.querySelectorAll('#tgtLangs .lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === 'en'));
+  document.getElementById('srcLabel').textContent = '원문 (한국어)';
+  document.getElementById('tgtLabel').textContent = '번역 결과 (English)';
+  updateCount();
+}
+
+function translate() {
+  const src = getSelectedLang('srcLangs');
+  const tgt = getSelectedLang('tgtLangs');
+  const style = document.getElementById('style').value;
+  const text = document.getElementById('srcText').value.trim();
+
+  if (!text) { showToast('번역할 텍스트를 입력해주세요'); return; }
+  if (src === tgt) { showToast('원문과 번역 언어가 같습니다'); return; }
+
+  const key = `${src}-${tgt}-${style}`;
+  let result = DEMO_TRANSLATIONS[key];
+
+  if (!result) {
+    // 스타일 무관 fallback
+    const fallbackKey = `${src}-${tgt}-formal`;
+    result = DEMO_TRANSLATIONS[fallbackKey];
+  }
+
+  if (!result) {
+    result = `[데모 모드] ${LANG_NAMES[src]} → ${LANG_NAMES[tgt]} 번역 데이터가 준비되지 않았습니다.\n\n실제 서비스에서는 AI 번역 API를 연동하여 실시간 번역을 제공합니다.\n\n원문:\n${text}`;
+  }
+
+  const tgtArea = document.getElementById('tgtText');
+  tgtArea.innerHTML = '';
+  tgtArea.textContent = result;
+
+  // 히스토리 추가
+  addHistory(src, tgt, style, text, result);
+  showToast('번역 완료!');
+}
+
+function addHistory(src, tgt, style, original, translated) {
+  const now = new Date();
+  const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  history.unshift({ src, tgt, style, original, translated, time: timeStr });
+  if (history.length > 10) history.pop();
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!history.length) {
+    list.innerHTML = '<div class="empty-history">아직 번역 기록이 없습니다</div>';
+    return;
+  }
+
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <span class="lang-pair">${LANG_NAMES[h.src]} → ${LANG_NAMES[h.tgt]}</span>
+      <span class="history-text">${esc(h.original.substring(0, 80))}</span>
+      <span class="history-time">${h.time}</span>
+    </div>
+  `).join('');
+}
+
+function loadHistory(idx) {
+  const h = history[idx];
+  document.getElementById('srcText').value = h.original;
+  document.getElementById('tgtText').textContent = h.translated;
+
+  document.querySelectorAll('#srcLangs .lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === h.src));
+  document.querySelectorAll('#tgtLangs .lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === h.tgt));
+  document.getElementById('srcLabel').textContent = `원문 (${LANG_NAMES[h.src]})`;
+  document.getElementById('tgtLabel').textContent = `번역 결과 (${LANG_NAMES[h.tgt]})`;
+  document.getElementById('style').value = h.style;
+  updateCount();
+}
+
+function clearAll() {
+  document.getElementById('srcText').value = '';
+  document.getElementById('tgtText').innerHTML = '<span class="output-placeholder">번역 결과가 여기에 표시됩니다</span>';
+  updateCount();
+}
+
+function copyResult() {
+  const el = document.getElementById('tgtText');
+  if (el.querySelector('.output-placeholder')) { showToast('번역 결과가 없습니다'); return; }
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('복사 완료!'));
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+
+</body>
+</html>
