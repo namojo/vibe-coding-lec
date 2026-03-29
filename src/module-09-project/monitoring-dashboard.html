@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 시스템 모니터링</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: #0f1923; color: #e0e6ed;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        .header {
+            background: #1a2332; border-bottom: 1px solid #2a3a4a;
+            padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+        .live-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(76,175,80,.15); color: #4caf50; padding: 4px 12px;
+            border-radius: 12px; font-size: 12px; font-weight: 500;
+        }
+        .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf50; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .speed-control { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .speed-control select {
+            background: #2a3a4a; color: #e0e6ed; border: 1px solid #3a4a5a;
+            padding: 4px 8px; border-radius: 4px; font-size: 12px;
+        }
+        .ctrl-btn {
+            padding: 6px 14px; border: 1px solid #3a4a5a; border-radius: 6px;
+            background: #2a3a4a; color: #e0e6ed; font-size: 13px; cursor: pointer;
+        }
+        .ctrl-btn:hover { background: #3a4a5a; }
+        .ctrl-btn.active { background: #e74c3c; border-color: #e74c3c; }
+        .ctrl-btn.paused { background: #f39c12; border-color: #f39c12; }
+
+        /* 경고 배너 */
+        .alert-banner {
+            display: none; padding: 10px 24px;
+            background: rgba(231,76,60,.15); border-bottom: 1px solid rgba(231,76,60,.3);
+            color: #e74c3c; font-size: 14px; align-items: center; gap: 10px;
+            animation: alertPulse 2s infinite;
+        }
+        .alert-banner.show { display: flex; }
+        @keyframes alertPulse { 0%,100%{opacity:1}50%{opacity:.7} }
+        .alert-banner .dismiss {
+            margin-left: auto; background: none; border: none;
+            color: #e74c3c; font-size: 16px; cursor: pointer;
+        }
+
+        .container { padding: 20px 24px; }
+
+        /* 상태 카드 */
+        .status-cards {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;
+        }
+        .status-card {
+            background: #1a2332; border: 1px solid #2a3a4a; border-radius: 10px; padding: 18px;
+        }
+        .status-card .label { font-size: 12px; color: #7f8c9b; text-transform: uppercase; letter-spacing: .5px; }
+        .status-card .value {
+            font-size: 32px; font-weight: 700; margin-top: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+        .status-card .sub { font-size: 12px; color: #7f8c9b; margin-top: 4px; }
+        .status-card .value.green { color: #4caf50; }
+        .status-card .value.yellow { color: #f39c12; }
+        .status-card .value.red { color: #e74c3c; }
+
+        /* 서버 상태 */
+        .server-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px; margin-bottom: 20px;
+        }
+        .server-item {
+            background: #1a2332; border: 1px solid #2a3a4a; border-radius: 8px;
+            padding: 14px; display: flex; align-items: center; gap: 10px;
+        }
+        .server-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .server-dot.up { background: #4caf50; }
+        .server-dot.warn { background: #f39c12; }
+        .server-dot.down { background: #e74c3c; animation: pulse 1s infinite; }
+        .server-info { flex: 1; }
+        .server-name { font-size: 13px; font-weight: 600; }
+        .server-detail { font-size: 11px; color: #7f8c9b; margin-top: 2px; }
+
+        /* 차트 영역 */
+        .chart-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+        }
+        .chart-panel {
+            background: #1a2332; border: 1px solid #2a3a4a; border-radius: 10px; padding: 16px;
+        }
+        .chart-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #fff; }
+
+        /* 이력 테이블 */
+        .table-panel {
+            background: #1a2332; border: 1px solid #2a3a4a; border-radius: 10px; padding: 16px;
+        }
+        .table-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #fff; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #2a3a4a; }
+        th { color: #7f8c9b; font-weight: 500; font-size: 11px; text-transform: uppercase; }
+        .tag {
+            display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+        }
+        .tag.critical { background: rgba(231,76,60,.2); color: #e74c3c; }
+        .tag.warning { background: rgba(243,156,18,.2); color: #f39c12; }
+        .tag.info { background: rgba(52,152,219,.2); color: #3498db; }
+        .tag.resolved { background: rgba(76,175,80,.2); color: #4caf50; }
+
+        .footer {
+            text-align: center; padding: 16px; font-size: 11px; color: #3a4a5a;
+        }
+
+        @media (max-width: 900px) {
+            .status-cards { grid-template-columns: repeat(2, 1fr); }
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>System Monitor</h1>
+        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    </div>
+    <div class="header-controls">
+        <div class="speed-control">
+            <span>갱신 속도:</span>
+            <select id="speedSelect" onchange="setSpeed(this.value)">
+                <option value="2000">0.5x (2초)</option>
+                <option value="1000" selected>1x (1초)</option>
+                <option value="500">2x (0.5초)</option>
+                <option value="200">5x (0.2초)</option>
+            </select>
+        </div>
+        <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()">일시정지</button>
+    </div>
+</div>
+
+<div class="alert-banner" id="alertBanner">
+    <span>&#9888;</span>
+    <span id="alertText">장애 감지: API-Gateway 응답 지연 (>2000ms)</span>
+    <button class="dismiss" onclick="dismissAlert()">&times;</button>
+</div>
+
+<div class="container">
+    <!-- 상태 카드 -->
+    <div class="status-cards">
+        <div class="status-card">
+            <div class="label">실시간 접속자</div>
+            <div class="value green" id="activeUsers">0</div>
+            <div class="sub" id="activeUsersSub">-</div>
+        </div>
+        <div class="status-card">
+            <div class="label">서버 상태</div>
+            <div class="value green" id="serverStatus">정상</div>
+            <div class="sub" id="serverStatusSub">전체 6대 가동중</div>
+        </div>
+        <div class="status-card">
+            <div class="label">API 응답시간</div>
+            <div class="value green" id="apiLatency">0ms</div>
+            <div class="sub" id="apiLatencySub">목표: &lt;500ms</div>
+        </div>
+        <div class="status-card">
+            <div class="label">CPU 사용률</div>
+            <div class="value green" id="cpuUsage">0%</div>
+            <div class="sub" id="cpuSub">-</div>
+        </div>
+    </div>
+
+    <!-- 서버 상태 -->
+    <div class="server-grid" id="serverGrid"></div>
+
+    <!-- 차트 -->
+    <div class="chart-grid">
+        <div class="chart-panel">
+            <h3>API 응답시간 (최근 60초)</h3>
+            <canvas id="latencyChart" height="120"></canvas>
+        </div>
+        <div class="chart-panel">
+            <h3>접속자 수 추이 (최근 60초)</h3>
+            <canvas id="usersChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- 이력 테이블 -->
+    <div class="table-panel">
+        <h3>최근 이벤트 이력</h3>
+        <table>
+            <thead><tr><th>시각</th><th>레벨</th><th>서버</th><th>내용</th><th>상태</th></tr></thead>
+            <tbody id="eventTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="footer">
+    NIA 시스템 모니터링 대시보드 &middot; 시뮬레이션 데이터 &middot; Chart.js
+</div>
+
+<script>
+// ── 서버 목록 ──
+const SERVERS = [
+    { id: 'web-01', name: 'Web Server 01', role: 'Frontend', cpu: 0, mem: 0, status: 'up' },
+    { id: 'web-02', name: 'Web Server 02', role: 'Frontend', cpu: 0, mem: 0, status: 'up' },
+    { id: 'api-01', name: 'API Gateway', role: 'Backend', cpu: 0, mem: 0, status: 'up' },
+    { id: 'api-02', name: 'API Worker', role: 'Backend', cpu: 0, mem: 0, status: 'up' },
+    { id: 'db-01', name: 'DB Primary', role: 'Database', cpu: 0, mem: 0, status: 'up' },
+    { id: 'db-02', name: 'DB Replica', role: 'Database', cpu: 0, mem: 0, status: 'up' },
+];
+
+// ── 상태 데이터 ──
+let latencyHistory = new Array(60).fill(120);
+let usersHistory = new Array(60).fill(245);
+let eventLog = [];
+let paused = false;
+let intervalId = null;
+let tickCount = 0;
+
+// ── 이벤트 시드 ──
+const EVENTS_SEED = [
+    { level: 'info', server: 'web-01', message: 'SSL 인증서 갱신 완료' },
+    { level: 'info', server: 'api-01', message: '스케일 아웃 완료 (인스턴스 +1)' },
+    { level: 'warning', server: 'db-01', message: '슬로우 쿼리 감지 (>3s)' },
+    { level: 'warning', server: 'api-02', message: '메모리 사용률 85% 초과' },
+    { level: 'info', server: 'web-02', message: '배포 완료 (v2.4.1)' },
+    { level: 'critical', server: 'api-01', message: 'API 응답 지연 (>2000ms)' },
+    { level: 'resolved', server: 'api-01', message: 'API 응답 정상화' },
+    { level: 'info', server: 'db-02', message: '리플리카 동기화 완료' },
+    { level: 'warning', server: 'web-01', message: '디스크 사용률 90% 초과' },
+];
+
+// ── 차트 초기화 ──
+const chartDefaults = {
+    responsive: true,
+    animation: { duration: 300 },
+    plugins: { legend: { display: false } },
+    scales: {
+        x: { display: false },
+        y: { grid: { color: '#2a3a4a' }, ticks: { color: '#7f8c9b', font: { size: 11 } } },
+    },
+};
+
+const latencyCtx = document.getElementById('latencyChart').getContext('2d');
+const latencyChart = new Chart(latencyCtx, {
+    type: 'line',
+    data: {
+        labels: latencyHistory.map((_, i) => i),
+        datasets: [{
+            data: [...latencyHistory],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52,152,219,.1)',
+            fill: true, tension: .3, pointRadius: 0, borderWidth: 2,
+        }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 0, max: 800, title: { display: true, text: 'ms', color: '#7f8c9b' } } } },
+});
+
+const usersCtx = document.getElementById('usersChart').getContext('2d');
+const usersChart = new Chart(usersCtx, {
+    type: 'line',
+    data: {
+        labels: usersHistory.map((_, i) => i),
+        datasets: [{
+            data: [...usersHistory],
+            borderColor: '#4caf50',
+            backgroundColor: 'rgba(76,175,80,.1)',
+            fill: true, tension: .3, pointRadius: 0, borderWidth: 2,
+        }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 0, title: { display: true, text: '명', color: '#7f8c9b' } } } },
+});
+
+// ── 서버 그리드 렌더 ──
+function renderServers() {
+    document.getElementById('serverGrid').innerHTML = SERVERS.map(s => `
+        <div class="server-item">
+            <div class="server-dot ${s.status}"></div>
+            <div class="server-info">
+                <div class="server-name">${s.name}</div>
+                <div class="server-detail">CPU ${s.cpu}% &middot; MEM ${s.mem}% &middot; ${s.role}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ── 이벤트 테이블 렌더 ──
+function renderEvents() {
+    document.getElementById('eventTable').innerHTML = eventLog.slice(0, 10).map(e => `
+        <tr>
+            <td style="white-space:nowrap;">${e.time}</td>
+            <td><span class="tag ${e.level}">${e.level.toUpperCase()}</span></td>
+            <td>${e.server}</td>
+            <td>${e.message}</td>
+            <td>${e.resolved ? '<span class="tag resolved">해결됨</span>' : '-'}</td>
+        </tr>
+    `).join('');
+}
+
+// ── 색상 헬퍼 ──
+function getValueColor(val, good, warn) {
+    if (val <= good) return 'green';
+    if (val <= warn) return 'yellow';
+    return 'red';
+}
+
+// ── 시뮬레이션 틱 ──
+function tick() {
+    tickCount++;
+
+    // 기본 값 + 랜덤 변동
+    const baseUsers = 245 + Math.sin(tickCount / 30) * 50;
+    const users = Math.round(baseUsers + (Math.random() - 0.5) * 30);
+    const baseLatency = 120 + Math.sin(tickCount / 20) * 40;
+    let latency = Math.round(baseLatency + (Math.random() - 0.5) * 50);
+    const cpu = Math.round(35 + Math.sin(tickCount / 15) * 15 + (Math.random() - 0.5) * 10);
+
+    // 간헐적 장애 시뮬레이션
+    let alert = false;
+    if (tickCount % 45 >= 40 && tickCount % 45 <= 43) {
+        latency = 800 + Math.round(Math.random() * 1200);
+        SERVERS[2].status = 'warn';
+        if (latency > 1500) {
+            SERVERS[2].status = 'down';
+            alert = true;
+        }
+    } else {
+        SERVERS[2].status = 'up';
+    }
+
+    // 서버 메트릭 업데이트
+    SERVERS.forEach(s => {
+        s.cpu = Math.round(cpu + (Math.random() - 0.5) * 20);
+        s.mem = Math.round(55 + Math.random() * 25);
+        if (s.cpu < 0) s.cpu = 3;
+        if (s.cpu > 100) s.cpu = 98;
+    });
+
+    // 히스토리 업데이트
+    latencyHistory.push(latency);
+    latencyHistory.shift();
+    usersHistory.push(users);
+    usersHistory.shift();
+
+    // 상태 카드 업데이트
+    const userEl = document.getElementById('activeUsers');
+    userEl.textContent = users.toLocaleString();
+    userEl.className = 'value ' + getValueColor(users, 400, 600);
+    document.getElementById('activeUsersSub').textContent =
+        `최근 1분 평균: ${Math.round(usersHistory.reduce((a,b)=>a+b,0)/60)}`;
+
+    const latEl = document.getElementById('apiLatency');
+    latEl.textContent = latency + 'ms';
+    latEl.className = 'value ' + getValueColor(latency, 500, 1000);
+    document.getElementById('apiLatencySub').textContent =
+        latency <= 500 ? '정상 범위' : latency <= 1000 ? '주의 필요' : '장애 의심';
+
+    const cpuEl = document.getElementById('cpuUsage');
+    cpuEl.textContent = cpu + '%';
+    cpuEl.className = 'value ' + getValueColor(cpu, 70, 90);
+    document.getElementById('cpuSub').textContent =
+        `평균: ${Math.round(SERVERS.reduce((s,sv)=>s+sv.cpu,0)/SERVERS.length)}%`;
+
+    const downServers = SERVERS.filter(s => s.status === 'down').length;
+    const warnServers = SERVERS.filter(s => s.status === 'warn').length;
+    const statusEl = document.getElementById('serverStatus');
+    if (downServers > 0) {
+        statusEl.textContent = '장애';
+        statusEl.className = 'value red';
+    } else if (warnServers > 0) {
+        statusEl.textContent = '주의';
+        statusEl.className = 'value yellow';
+    } else {
+        statusEl.textContent = '정상';
+        statusEl.className = 'value green';
+    }
+    document.getElementById('serverStatusSub').textContent =
+        `정상 ${6-downServers-warnServers} / 주의 ${warnServers} / 장애 ${downServers}`;
+
+    // 경고 배너
+    if (alert) {
+        document.getElementById('alertBanner').classList.add('show');
+        document.getElementById('alertText').textContent =
+            `장애 감지: API-Gateway 응답 지연 (${latency}ms)`;
+    } else if (!alert && tickCount % 45 === 0) {
+        document.getElementById('alertBanner').classList.remove('show');
+    }
+
+    // 랜덤 이벤트 추가
+    if (Math.random() > 0.92) {
+        const evt = EVENTS_SEED[Math.floor(Math.random() * EVENTS_SEED.length)];
+        eventLog.unshift({
+            ...evt,
+            time: new Date().toLocaleTimeString('ko-KR'),
+            resolved: evt.level === 'resolved',
+        });
+        if (eventLog.length > 50) eventLog.length = 50;
+        renderEvents();
+    }
+
+    // 차트 업데이트
+    latencyChart.data.datasets[0].data = [...latencyHistory];
+    latencyChart.update('none');
+    usersChart.data.datasets[0].data = [...usersHistory];
+    usersChart.update('none');
+
+    renderServers();
+}
+
+// ── 제어 ──
+function setSpeed(ms) {
+    if (intervalId) clearInterval(intervalId);
+    if (!paused) intervalId = setInterval(tick, parseInt(ms));
+}
+
+function togglePause() {
+    paused = !paused;
+    const btn = document.getElementById('pauseBtn');
+    if (paused) {
+        clearInterval(intervalId);
+        btn.textContent = '재개';
+        btn.classList.add('paused');
+    } else {
+        const speed = parseInt(document.getElementById('speedSelect').value);
+        intervalId = setInterval(tick, speed);
+        btn.textContent = '일시정지';
+        btn.classList.remove('paused');
+    }
+}
+
+function dismissAlert() {
+    document.getElementById('alertBanner').classList.remove('show');
+}
+
+// ── 초기 이벤트 시드 ──
+eventLog = [
+    { time: '14:32:15', level: 'info', server: 'web-01', message: 'SSL 인증서 갱신 완료', resolved: false },
+    { time: '14:28:03', level: 'warning', server: 'db-01', message: '슬로우 쿼리 감지 (3.2s)', resolved: false },
+    { time: '14:15:42', level: 'info', server: 'api-01', message: '배포 완료 (v2.4.1)', resolved: false },
+    { time: '13:58:11', level: 'critical', server: 'api-01', message: 'API 응답 지연 (2340ms)', resolved: true },
+    { time: '13:55:20', level: 'resolved', server: 'api-01', message: 'API 응답 정상화 (120ms)', resolved: true },
+];
+
+// ── 시작 ──
+renderServers();
+renderEvents();
+intervalId = setInterval(tick, 1000);
+</script>
+</body>
+</html>
